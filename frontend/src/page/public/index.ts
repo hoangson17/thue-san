@@ -1,0 +1,8 @@
+export {default as Home} from './Home'
+export {default as HomePage} from './HomePage'
+export {default as Auth} from './Auth'
+export {default as Store} from './Store'
+export {default as ProductDetail} from './ProductDetail'
+export {default as Google} from './Google'
+export {default as Contact} from './Contact'
+export {default as About} from './About'
