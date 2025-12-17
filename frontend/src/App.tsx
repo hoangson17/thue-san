@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
-import { HomePage , Home, Auth, Store, ProductDetail, About, Contact } from './page/public'
+import { HomePage , Home, Auth, Store, ProductDetail, Tournament, Contact, Court, CourtDetail } from './page/public'
 import Google from './page/public/Google'
 import { Toaster } from 'sonner'
 
@@ -14,7 +14,9 @@ function App() {
           <Route path='/products?category=:category' element={<Store />} />
           <Route path='/products/:id' element={<ProductDetail />} />
           <Route path='/contact' element={<Contact />} />
-          <Route path='/about' element={<About />} />
+          <Route path='/tournament' element={<Tournament />} />
+          <Route path='/courts' element={<Court />} />
+          <Route path='/courts/:id' element={<CourtDetail />} />
         </Route>
           <Route path='/login' element={<Auth type="login" />} />
           <Route path='/register' element={<Auth type="register" />} />

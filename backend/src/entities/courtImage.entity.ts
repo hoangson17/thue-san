@@ -9,7 +9,8 @@ export class CourtImage {
   @Column({ type: 'text' })
   url: string;
 
-  @ManyToOne(() => Court, (court) => court.images)
+  @ManyToOne(() => Court, (court) => court.images, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'court_id' }) 
   court: Court;
 }
+ 

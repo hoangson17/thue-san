@@ -1,6 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CourtService } from './court.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('court')
 export class CourtController {
@@ -32,14 +42,9 @@ export class CourtController {
   }
 
   @Post()
-  create(@Body() data: any) {
-    return this.courtService.create(data);
-  }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+  @UseInterceptors(FilesInterceptor('files', 6))
+  create(@Body() data: any, @UploadedFiles() files: Express.Multer.File) {
+    return this.courtService.create(data, files as any);
   }
 
   @Post('/courtType')
@@ -68,8 +73,9 @@ export class CourtController {
   }
 
   @Patch('/update/:id')
-  update(@Param() id: number, @Body() data: any) {
-    return this.courtService.update(id, data);
+  @UseInterceptors(FilesInterceptor('files', 6))
+  update(@Param() id: number, @Body() data: any, @UploadedFiles() files: Express.Multer.File[]) {
+    return this.courtService.update(id, data, files);
   }
 
   @Patch('/updateCourtType/:id')
@@ -86,6 +92,4 @@ export class CourtController {
   deleteCourtType(@Param() id: number) {
     return this.courtService.deleteCourtType(id);
   }
-
-
 }

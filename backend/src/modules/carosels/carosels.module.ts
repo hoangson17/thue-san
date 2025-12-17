@@ -18,7 +18,7 @@ import { extname } from 'path';
     TypeOrmModule.forFeature([Carosel]),
     MulterModule.register({
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/carosels',
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)

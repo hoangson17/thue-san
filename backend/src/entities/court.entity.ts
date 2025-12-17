@@ -33,6 +33,9 @@ export class Court {
     @Column({ type: 'varchar', length: 100 })
     note: string
 
+    @Column({ type: 'text', nullable: true })
+    description: string
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 

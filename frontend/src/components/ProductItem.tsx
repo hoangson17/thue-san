@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 
 const ProductItem = ({ item }: { item: any }) => {
   const images = Array.isArray(item.images) ? item.images : [];
@@ -70,12 +71,12 @@ const ProductItem = ({ item }: { item: any }) => {
           +
         </button>
       </div>
-      <div className="flex flex-col gap-3 mt-5">
+      <div className="grid grid-cols-2 gap-3 mt-5">
         <Button variant="default" onClick={handleAddToCart}>
-          Thêm vào giỏ hàng
+          <ShoppingCart />
         </Button>
 
-        <Button variant="secondary">Mua ngay</Button>
+        <Button variant="secondary">Mua</Button>
       </div>
     </div>
   );

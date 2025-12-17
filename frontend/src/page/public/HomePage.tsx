@@ -1,6 +1,5 @@
 import React from "react";
-import ListCourt from "../../components/ListCourt";
-import { Carosel } from "@/components";
+import { Carosel, HomeIntro, Partner } from "@/components";
 
 const HomePage = () => {
   return (
@@ -8,7 +7,8 @@ const HomePage = () => {
       <div>
         <Carosel />
       </div>
-      <ListCourt />
+      <HomeIntro />
+      <Partner />
     </div>
   );
 };

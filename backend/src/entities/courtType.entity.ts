@@ -15,7 +15,9 @@ export class CourtType {
     @Column({ type: 'varchar', length: 100 })
     name: string
 
-    @OneToMany(() => CourtType, (court_type) => court_type.sport_id)
+    @OneToMany(() => CourtType, (court_type) => court_type.sport_id,{
+        onDelete: 'CASCADE' 
+    })
     courts: CourtType[];
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

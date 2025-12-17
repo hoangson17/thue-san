@@ -13,6 +13,8 @@ import { ProductsModule } from './modules/products/products.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { CaroselsModule } from './modules/carosels/carosels.module';
+import { BookingModule } from './modules/booking/booking.module';
+import { ToumamentModule } from './modules/toumament/toumament.module';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { CaroselsModule } from './modules/carosels/carosels.module';
     }),
     ProductsModule,
     CaroselsModule,
+    BookingModule,
+    ToumamentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

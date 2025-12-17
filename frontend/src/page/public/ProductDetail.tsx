@@ -25,20 +25,21 @@ const ProductDetail = () => {
   const images = productDetail?.images ?? [];
 
   return (
-    <div className="p-4">
+    <div className="px-16 py-10">
       <h1 className="text-3xl font-bold mb-4">{productDetail?.name}</h1>
-      <div className="mt-3 flex flex-col lg:flex-row gap-6">
-        <div className="w-full lg:w-3/6 aspect-square">
+      <div className="flex">
+        <div className="mt-3 flex flex-col lg:flex-row gap-6">
+        <div className="w-full lg:w-3/6">
           <Carousel>
             <CarouselContent>
               {images.map((image: any, index: number) => (
                 <CarouselItem key={index}>
                   <div className="p-1">
-                    <div className="w-full aspect-square overflow-hidden rounded-2xl shadow-md border">
+                    <div className="w-3/4 m-auto overflow-hidden rounded-2xl shadow-md border">
                       <img
                         src={`${import.meta.env.VITE_SERVER_API}${image.url}`}
                         alt={`image-${index}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover aspect-square"
                       />
                     </div>
                   </div>
@@ -50,24 +51,22 @@ const ProductDetail = () => {
             <CarouselNext className="right-2" />
           </Carousel>
         </div>
-        <div className="w-full">
-          <Card className="rounded-2xl shadow-sm h-full">
-            <CardContent className="p-6 space-y-5">
-              <p className="text-2xl font-semibold">{productDetail?.name}</p>
-              <p className="text-sm text-muted-foreground bg-gray-100 inline-block px-3 py-1 rounded-full">
-                {productDetail?.category}
-              </p>
-              <p className="text-3xl font-bold text-blue-600">
+        <div className="lg:w-3/6">
+          <Card className="rounded-2xl border-none shadow-none h-full">
+            <CardContent className="px-8 py-2 space-y-2">
+              <div className="border-b-2 border-gray-300 pb-2">
+                <p className="text-2xl font-semibold">{productDetail?.name}</p>
+                <p className="text-sm text-muted-foreground bg-gray-100 inline-block px-3 py-1 rounded-full">
+                  {productDetail?.category}
+                </p>
+              </div>
+              <p className="text-3xl font-bold text-gray-400">
                 {productDetail?.price?.toLocaleString()}₫
               </p>
-                <p>
-                    {productDetail?.description}
-                </p>
+              <p>{productDetail?.description}</p>
               <p
                 className={`font-medium ${
-                  productDetail?.stock > 0
-                    ? "text-green-600"
-                    : "text-red-500"
+                  productDetail?.stock > 0 ? "text-green-600" : "text-red-500"
                 }`}
               >
                 {productDetail?.stock > 0
@@ -75,14 +74,15 @@ const ProductDetail = () => {
                   : "Hết hàng"}
               </p>
               <div className="flex gap-3 pt-3">
-                <Button className="px-6 text-lg">Buy Now</Button>
+                <Button className="px-6 text-lg">Mua ngay</Button>
                 <Button variant="outline" className="px-6 text-lg">
-                  Add to Cart
+                  Thêm vào giỏ hàng
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
+      </div>
       </div>
     </div>
   );

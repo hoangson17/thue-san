@@ -47,7 +47,7 @@ const Store = () => {
   ];
 
   return (
-    <div className="px-16 py-7">
+    <div className="px-16 py-7 max-w-7xl mx-auto">
       <div>
         <NavigationMenu className="mb-5">
           <NavigationMenuList className="flex gap-2 bg-white border rounded-xl p-1 shadow-sm">
@@ -77,7 +77,7 @@ const Store = () => {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           {dataToRender?.map((product: any) => (
             <ProductItem key={product.id} item={product} />
           ))}

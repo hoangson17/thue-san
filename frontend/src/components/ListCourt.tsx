@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
+import CourtItem from "./CourtItem";
 
-const ListCourt = () => {
+const ListCourt = ({ items }: any) => {
   return (
-    <div className='px-16 py-7'>ListCourt</div>
-  )
-}
+    <div>
+      <div className="grid grid-cols-4 gap-5">
+        {items.map((item: any) => (
+          <CourtItem key={item.id} item={item} />
+        ))}
+      </div>
+    </div>
+  );
+};
 
-export default ListCourt
+export default ListCourt;

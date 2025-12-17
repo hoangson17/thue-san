@@ -118,3 +118,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.continuous-3 {
+  width: 120px;
+  height: 10px;
+  transform: skewX(-45deg);
+  background: 
+    linear-gradient(#f03355 0 0) left -30px top 0/30px 20px no-repeat 
+    #ccc;
+  animation: ct3 1s infinite linear;
+}
+
+@keyframes ct3 {
+  100% {background-position: right -30px top 0}
+}

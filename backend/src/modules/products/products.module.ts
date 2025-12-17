@@ -18,7 +18,7 @@ import { ProductImage } from 'src/entities/productImage.entity';
     }),
     MulterModule.register({
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/products',
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)

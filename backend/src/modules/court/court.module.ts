@@ -9,6 +9,7 @@ import { Sport } from 'src/entities/sport.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { CourtImage } from 'src/entities/courtImage.entity';
 
 @Module({
   controllers: [CourtController],
@@ -17,10 +18,10 @@ import { extname } from 'path';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forFeature([Court, CourtType, Sport]),
+    TypeOrmModule.forFeature([Court, CourtType, Sport, CourtImage]),
     MulterModule.register({
       storage: diskStorage({
-        destination: './uploads', // Thư mục đích
+        destination: './uploads/court', // Thư mục đích
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)

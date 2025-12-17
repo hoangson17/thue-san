@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getCarosel } from "@/stores/actions/caroselActions";
 import type { CarouselApi } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 const Carosel = () => {
   const dispatch = useDispatch();
@@ -36,13 +37,22 @@ const Carosel = () => {
   return (
     <div className="relative">
       <Carousel
-        opts={{ loop: true }}
+        opts={{
+          align: "start",
+          loop: true,
+        }}
+        plugins={[
+          Autoplay({
+            delay: 2500,
+            stopOnInteraction: false,
+          }),
+        ]}
         setApi={setApi}
       >
         <CarouselContent>
           {Array.isArray(carosels) &&
             carosels.map((item: any) => (
-              <CarouselItem key={item.id} className="h-[400px]">
+              <CarouselItem key={item.id} className="md:h-[100vh] ">
                 <img
                   src={`${import.meta.env.VITE_SERVER_API}${item.url}`}
                   alt={item.description}
@@ -62,9 +72,7 @@ const Carosel = () => {
             key={index}
             onClick={() => api?.scrollTo(index)}
             className={`h-3 w-3 rounded-full transition-all ${
-              current === index
-                ? "bg-white scale-110"
-                : "bg-white/50"
+              current === index ? "bg-white scale-110" : "bg-white/50"
             }`}
           />
         ))}

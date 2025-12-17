@@ -18,11 +18,11 @@ export class CaroselsService {
     }
 
     create(data: any, file: Express.Multer.File) {        
-        return this.caroselsRepository.save({ ...data,url: `/uploads/${file.filename}`,});
+        return this.caroselsRepository.save({ ...data,url: `/uploads/carosels/${file.filename}`,});
     }
 
     update(id: number, data: any, file: Express.Multer.File) {
-        return this.caroselsRepository.update({ id }, { ...data,url: `/uploads/${file.filename}`,});
+        return this.caroselsRepository.update({ id }, { ...data,url: `/uploads/carosels/${file.filename}`,});
     }
 
     softDelete(id: number) {

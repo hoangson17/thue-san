@@ -1,15 +1,15 @@
 import { Facebook, Send, Youtube } from "lucide-react";
-import logo from "@/assets/react.svg";
+import logo from "@/assets/image_3.png";
 import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="mt-10 px-16 py-5">
+    <footer className="mt-10 px-16 py-5 max-w-7xl mx-auto">
       <div className="container mx-auto ">
         
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex-1 h-px bg-gray-300" />
-          <img src={logo} alt="logo" className="h-10" />
+          <img src={logo} alt="logo" className="h-20" />
           <div className="flex-1 h-px bg-gray-300" />
         </div>
 

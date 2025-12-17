@@ -27,7 +27,7 @@ export class CourtPricings {
     type: 'enum',
     enum: DayType,
     default: DayType.WEEKDAY,
-  })
+  }) 
   dayType: DayType;
 
   @Column({ type: 'varchar', length: 100 })

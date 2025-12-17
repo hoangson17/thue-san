@@ -5,6 +5,7 @@ import authReducer from "./authReducer";
 import actionTypes from "../actions/actionTypes";
 import productsReducer from "./productsReducer";
 import caroselReducer from "./caroselReducer";
+import courtReducer from "./courtReducer";
 
 const authPersistConfig = {
   key: "auth",
@@ -15,7 +16,8 @@ const authPersistConfig = {
 const appReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   products: productsReducer,
-  carosels: caroselReducer
+  carosels: caroselReducer,
+  courts: courtReducer
 });
 
 const rootReducer = (state:any, action:any) => {

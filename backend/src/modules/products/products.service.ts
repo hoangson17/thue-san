@@ -40,7 +40,7 @@ async findByCategory(category: string) {
     const images = await Promise.all(
       files.map((file) =>
         this.productImageRepository.save({
-          url: `/uploads/${file.filename}`,
+          url: `/uploads/products/${file.filename}`,
           product: product.id,
         }),
       ),
@@ -60,10 +60,11 @@ async findByCategory(category: string) {
     await this.productsRepository.update(id, data);
 
     if (files && files.length > 0) {
+      await this.productImageRepository.delete({ product: product });
       const newImages = await Promise.all(
         files.map((file) =>
           this.productImageRepository.save({
-            url: `/uploads/${file.filename}`,
+            url: `/uploads/products/${file.filename}`,
             product: product.id as any,
           }),
         ),
