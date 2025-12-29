@@ -1,14 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { ToumamentService } from './toumament.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
-@Controller('toumament')
+export type QueryParams = {
+  select: string;
+  order: string;
+  sort: string;
+  page: number;
+  limit: number;
+  status: string;
+  name: string;
+  email: string;
+  include: string;
+};
+
+@Controller('tournaments')
 export class ToumamentController {
   constructor(private readonly toumamentService: ToumamentService) {}
 
   @Get()
-  findAll() {
-    return this.toumamentService.findAll();
+  findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+      return this.toumamentService.findAll({ page, limit });
   }
 
   @Get(':id')

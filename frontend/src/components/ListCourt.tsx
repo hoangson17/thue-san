@@ -1,7 +1,7 @@
 import React from "react";
 import CourtItem from "./CourtItem";
 
-const ListCourt = ({ items }: any) => {
+const ListCourt = ({ items = [] }: any) => {
   return (
     <div>
       <div className="grid grid-cols-4 gap-5">

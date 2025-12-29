@@ -15,6 +15,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { CaroselsModule } from './modules/carosels/carosels.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { ToumamentModule } from './modules/toumament/toumament.module';
+import { SupportModule } from './modules/support/support.module';
+import { UsersModule } from './modules/users/users.module';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
@@ -27,7 +30,7 @@ import { ToumamentModule } from './modules/toumament/toumament.module';
       port: process.env.DB_PORT as unknown as number,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      database: process.env.DB_NAME, 
       entities: ['dist/entities/*.entity{.ts,.js}'],
       synchronize:
         process.env.NODE_ENV === 'development' || !process.env.NODE_ENV,
@@ -57,6 +60,9 @@ import { ToumamentModule } from './modules/toumament/toumament.module';
     CaroselsModule,
     BookingModule,
     ToumamentModule,
+    SupportModule,
+    UsersModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService],

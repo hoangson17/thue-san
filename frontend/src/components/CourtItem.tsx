@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import img from "../assets/image_3.png";
 import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 const CourtItem = ({ item }: any) => {
   return (
@@ -15,7 +16,6 @@ const CourtItem = ({ item }: any) => {
       <Link to={`/courts/${item.id}`}>
         <CardHeader>
           <CardTitle>{item.name}</CardTitle>
-
           {item.images?.length > 0 ? (
             <img
               src={`${import.meta.env.VITE_SERVER_API}${item.images[0].url}`}
@@ -29,24 +29,18 @@ const CourtItem = ({ item }: any) => {
               className="w-full h-40 object-cover rounded-md"
             />
           )}
-
-          {item.court_type && (
-            <CardDescription>{item?.court_type.name}</CardDescription>
-          )}
         </CardHeader>
-
-        {item.court_type && (
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {item?.court_type.sport_id?.name}
-            </p>
-          </CardContent>
-        )}
-          <CardContent>
-            <p className="text-sm text-muted-foreground truncate">
-              {item?.note}
-            </p>
-          </CardContent>
+        <CardContent>
+          {item.court_type && (
+            <div className="flex gap-2 mt-2">
+              <Badge variant="destructive" className="text-sm ">
+                {item?.court_type.sport_id?.name}
+              </Badge>
+              <Badge variant="outline" className="text-sm">{item?.court_type.name}</Badge>
+            </div>
+          )}
+          <p className="text-sm text-muted-foreground truncate">{item?.note}</p>
+        </CardContent>
       </Link>
     </Card>
   );

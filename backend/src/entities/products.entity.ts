@@ -26,6 +26,9 @@ export class Products {
     @Column({ type: 'int' })
     stock: number;
 
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
     @DeleteDateColumn()
     deletedAt: Date;
 }

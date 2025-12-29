@@ -10,6 +10,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { CourtImage } from 'src/entities/courtImage.entity';
+import { CourtPricings } from 'src/entities/courtPricings.entity';
 
 @Module({
   controllers: [CourtController],
@@ -18,7 +19,7 @@ import { CourtImage } from 'src/entities/courtImage.entity';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forFeature([Court, CourtType, Sport, CourtImage]),
+    TypeOrmModule.forFeature([Court, CourtType, Sport, CourtImage, CourtPricings]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/court', // Thư mục đích

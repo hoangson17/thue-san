@@ -2,10 +2,6 @@ import actionTypes from "../actions/actionTypes";
 
 const initialState = {
   user: null,
-  allUser: [] as any[],
-  lockUser: [] as any[],
-  accessToken: null,
-  refreshToken: null,
   loading: false,
   error: null,
   isAuthenticated: false,
@@ -14,7 +10,11 @@ const initialState = {
 const authReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case actionTypes.LOGIN_REQUEST:
-      return { ...state, loading: true, error: null };
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
 
     case actionTypes.LOGIN_SUCCESS:
       return {
@@ -22,31 +22,24 @@ const authReducer = (state = initialState, action: any) => {
         loading: false,
         isAuthenticated: true,
         user: action.payload.user,
-        accessToken: action.payload.accessToken,
-        refreshToken: action.payload.refreshToken,
+      };
+
+    case actionTypes.LOGIN_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        isAuthenticated: false,
+        error: action.payload,
       };
 
     case actionTypes.REGISTER_SUCCESS:
       return {
         ...state,
         loading: false,
-        isAuthenticated: false,
-        user: action.payload.user,
-        accessToken: action.payload.accessToken,
-        refreshToken: action.payload.refreshToken,
       };
-
-    case actionTypes.LOGIN_FAILURE:
-      return { ...state, loading: false, error: action.payload };
 
     case actionTypes.LOGOUT:
-      return {
-        ...state,
-        user: null,
-        accessToken: null,
-        refreshToken: null,
-        isAuthenticated: false,
-      };
+      return initialState;
 
     default:
       return state;

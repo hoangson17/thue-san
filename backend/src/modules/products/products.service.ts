@@ -13,19 +13,31 @@ export class ProductsService {
     private readonly productImageRepository: Repository<ProductImage>,
   ) {}
 
-async findAll() {
-  return this.productsRepository.find({
-    relations: ['images'],
-  });
-}
+  async findAll({ page = 1, limit = 10, category, }: {
+    page?: number;
+    limit?: number;
+    category?: string;
+  }) {
+    const where: any = {};
+    if (category) {
+      where.category = category;
+    }
 
-async findByCategory(category: string) {
-  return this.productsRepository.find({
-    where: { category },
-    relations: ['images'],
-  });
-}
+    return this.productsRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      where,
+      relations: ['images'],
+      order: { createdAt: 'DESC' },
+    });
+  }
 
+  async findByCategory(category: string) {
+    return this.productsRepository.find({
+      where: { category },
+      relations: ['images'],
+    });
+  }
 
   async findOne(id: number) {
     return await this.productsRepository.findOne({
@@ -56,9 +68,9 @@ async findByCategory(category: string) {
     });
 
     if (!product) throw new Error('Product not found');
-
-    await this.productsRepository.update(id, data);
-
+    const newProduct = { ...product, ...data };
+    delete newProduct.images;
+    await this.productsRepository.update(id, newProduct);
     if (files && files.length > 0) {
       await this.productImageRepository.delete({ product: product });
       const newImages = await Promise.all(
@@ -69,11 +81,10 @@ async findByCategory(category: string) {
           }),
         ),
       );
-
-      product.images = newImages;
+      newProduct.images = newImages;
     }
 
-    return product;
+    return newProduct;
   }
 
   async deleteProduct(id: number) {

@@ -76,7 +76,6 @@ export class AuthService {
         avatar: picture,
       });
     }
-
     return this.createToken(user);
   }
 
@@ -156,7 +155,7 @@ export class AuthService {
     return { success: true };
   }
 
-  async createToken(user: any) {
+ async createToken(user: any) {
     const jtiAccessToken = uuid();
     const token = this.jwtService.sign({
       jti: jtiAccessToken,
@@ -189,10 +188,21 @@ export class AuthService {
       JSON.stringify({
         jtiAccessToken,
         exp: expAccessToken,
+        userId: user.id,
       }),
       'EX',
       Math.round(expRefreshToken - Date.now() / 1000),
     );
+    await this.redis.set(
+      `Device_${user.id}`,
+      jtiAccessToken,
+      'EX',
+      Math.round(expAccessToken - Date.now() / 1000),
+    );
+    await this.redis.keys(`jwt_refresh_*`);
+
+    delete (user as any).password;
+
     return {
       accessToken: token,
       refreshToken,
@@ -200,6 +210,7 @@ export class AuthService {
     };
   }
 
+  
   async register(body: any) {
     const { email, password, name, phone } = body;
 

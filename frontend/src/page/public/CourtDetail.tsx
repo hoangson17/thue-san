@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/popover";
 import { ChevronDownIcon, Phone } from "lucide-react";
 import getDayType from "@/utils/isWeekend";
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -31,9 +33,12 @@ const fadeUp = {
 const CourtDetail = () => {
   const dispatch = useDispatch();
   const { court, loading } = useSelector((state: any) => state.courts);
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
+  const [selectedPricing, setSelectedPricing] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>();
   const id = window.location.pathname.split("/")[2];
+  const canBooking = isAuthenticated && date && selectedPricing;
 
   useEffect(() => {
     dispatch(getDetailCourt(id) as any);
@@ -43,11 +48,10 @@ const CourtDetail = () => {
 
   const filteredPricings = React.useMemo(() => {
     if (!dayType) return [];
-    return court?.court_pricings?.filter(
-      (item: any) => item.dayType === dayType
-    ).reverse();
+    return court?.court_pricings
+      ?.filter((item: any) => item.dayType === dayType)
+      .reverse();
   }, [court, dayType]);
-  
 
   // console.log(court);
 
@@ -77,7 +81,7 @@ const CourtDetail = () => {
         <div className="lg:col-span-2 space-y-8">
           {court.images?.length > 0 && (
             <motion.div {...fadeUp}>
-              <Card className="overflow-hidden rounded-2xl shadow-lg">
+              <Card className="overflow-hidden p-0 rounded-2xl shadow-lg">
                 <CardContent className="p-0">
                   <Carousel>
                     <CarouselContent>
@@ -100,22 +104,6 @@ const CourtDetail = () => {
           )}
         </div>
         <div className="space-y-6">
-          {/* <motion.div {...fadeUp}>
-            <Card className="rounded-2xl shadow-md sticky top-24">
-              <CardHeader>
-                <CardTitle>Đặt sân nhanh</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button size="lg" className="w-full">
-                  Đặt sân ngay
-                </Button>
-                <Button variant="outline" className="w-full gap-2">
-                  <Phone className="w-4 h-4" /> Liên hệ chủ sân
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div> */}
-
           <motion.div {...fadeUp}>
             <Card className="rounded-2xl">
               <CardContent className="space-y-3">
@@ -163,11 +151,17 @@ const CourtDetail = () => {
                       {filteredPricings.map((item: any) => (
                         <button
                           key={item.id}
-                          className="
-                          rounded-lg border text-sm
-                          flex flex-col items-center justify-between
-                          py-2 hover:bg-muted transition
-                        "
+                          onClick={() =>
+                            setSelectedPricing(
+                              selectedPricing === item.id ? null : item.id
+                            )
+                          }
+                          className={cn(
+                            "rounded-lg border text-sm flex flex-col items-center justify-between py-2 transition cursor-pointer",
+                            selectedPricing === item.id
+                              ? "border-primary bg-primary/10"
+                              : "hover:bg-muted"
+                          )}
                         >
                           <span className="font-medium">
                             {item.timeStart} - {item.timeEnd}
@@ -180,8 +174,23 @@ const CourtDetail = () => {
                       ))}
                     </div>
                     <div className="mt-3">
-                      <Button size="lg" className="w-full">
-                        Đặt sân ngay
+                      <Button
+                        size="lg"
+                        className="w-full cursor-pointer"
+                        disabled={!canBooking}
+                        onClick={() => {
+                          console.log({
+                            courtId: court.id,
+                            date,
+                            pricingId: selectedPricing,
+                          });
+                        }}
+                      >
+                        {!isAuthenticated
+                          ? "Đăng nhập để đặt sân"
+                          : !selectedPricing
+                          ? "Chọn khung giờ"
+                          : "Đặt sân ngay"}
                       </Button>
                     </div>
                   </div>
@@ -210,12 +219,9 @@ const CourtDetail = () => {
         {" "}
         <motion.div {...fadeUp}>
           <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle>Mô tả sân</CardTitle>
-            </CardHeader>
             <CardContent>
+              <h3 className="text-xl font-bold">Mô tả chi tiết</h3>
               {court.description ? (
-                // <p className="leading-relaxed text-sm">{court.description}</p>
                 <div
                   className="
                     text-sm leading-relaxed space-y-2

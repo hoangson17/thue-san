@@ -6,6 +6,9 @@ import actionTypes from "../actions/actionTypes";
 import productsReducer from "./productsReducer";
 import caroselReducer from "./caroselReducer";
 import courtReducer from "./courtReducer";
+import tournamentReducer from "./tournamentReducer";
+import { usersReducer } from "./usersReducer";
+import cartReducer from "./cartReducer";
 
 const authPersistConfig = {
   key: "auth",
@@ -17,17 +20,20 @@ const appReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   products: productsReducer,
   carosels: caroselReducer,
-  courts: courtReducer
+  courts: courtReducer,
+  tournaments: tournamentReducer,
+  users: usersReducer,
+  cart: cartReducer
 });
 
-const rootReducer = (state:any, action:any) => {
+const rootReducer = (state: any, action: any) => {
   if (action.type === actionTypes.LOGOUT) {
-    state = {...state, auth: { user: null, accessToken: null, refreshToken: null, isAuthenticated: false }};
     storage.removeItem("persist:auth");
     storage.removeItem("accessToken");
     storage.removeItem("refreshToken");
   }
   return appReducer(state, action);
 };
+
 
 export default rootReducer;

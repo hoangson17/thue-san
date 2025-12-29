@@ -15,12 +15,17 @@ export class ToumamentService {
     private toumamentImageRepository: Repository<ToumamentImage>,
   ) {}
 
-  findAll() {
-    return this.toumamentRepository.find({
-      relations: {
-        images: true,
-      },
-    });
+  findAll({ page, limit }: { page?: number; limit?: number }) {
+    if (!page || !limit) {
+      return this.toumamentRepository.findAndCount();
+    }
+
+    return this.toumamentRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      relations: { images: true },
+      order: { createdAt: 'DESC' },
+    })
   }
 
   findOne(id: number) {
@@ -44,58 +49,36 @@ export class ToumamentService {
     return toumament;
   }
 
-async update(
-  id: number,
-  data: any,
-  files?: Express.Multer.File[],
-) {
-  const toumament = await this.toumamentRepository.findOne({
-    where: { id },
-    relations: ['images'],
-  });
+  async update(id: number, data: any, files?: Express.Multer.File[]) {
+    const toumament = await this.toumamentRepository.findOne({
+      where: { id },
+      relations: ['images'],
+    });
 
-  if (!toumament) throw new Error('Toumament not found');
+    if (!toumament) throw new Error('Toumament not found');
 
-  // 1. Xóa ảnh cũ (file + DB)
-  if (toumament.images?.length) {
-    await Promise.all(
-      toumament.images.map(async (image) => {
-        const filePath = path.join(
-          process.cwd(),
-          image.url.replace(/^\//, ''),
-        );
+    await this.toumamentRepository.save({
+      ...toumament,
+      ...data,
+    });
 
-        try {
-          await fs.unlink(filePath); // xóa file
-        } catch (err) {
-        }
+    if (files?.length) {
+      await this.toumamentImageRepository.delete({ toumament: toumament });
+      await Promise.all(
+        files.map((file) =>
+          this.toumamentImageRepository.save({
+            url: `/uploads/toumament/${file.filename}`,
+            toumament: { id },
+          }),
+        ),
+      );
+    }
 
-        await this.toumamentImageRepository.delete(image.id); // xóa DB
-      }),
-    );
+    return this.toumamentRepository.findOne({
+      where: { id },
+      relations: ['images'],
+    });
   }
-
-  await this.toumamentRepository.save({
-    ...toumament,
-    ...data,
-  });
-
-  if (files?.length) {
-    await Promise.all(
-      files.map((file) =>
-        this.toumamentImageRepository.save({
-          url: `/uploads/toumament/${file.filename}`,
-          toumament: { id }, // tránh circular
-        }),
-      ),
-    );
-  }
-
-  return this.toumamentRepository.findOne({
-    where: { id },
-    relations: ['images'],
-  });
-}
 
   delete(id: number) {
     return this.toumamentRepository.delete(id);

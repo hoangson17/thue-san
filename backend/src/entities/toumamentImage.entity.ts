@@ -18,6 +18,7 @@ export class ToumamentImage {
 
   @ManyToOne(() => Toumament, (t) => t.images, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'toumament_id' })
   @Exclude()

@@ -43,11 +43,11 @@ export const authService = {
     });
   },
 
-  getAllUsers: () =>
-    axiosInstance.get("/user/all", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  getAllUsers:async (page: number) =>
+    await axiosInstance.get("/users", {
+      params: {
+        page,
+        limit:import.meta.env.VITE_PAGE_LIMIT,
       },
     }),
 

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,10 +17,21 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 export class CourtController {
   constructor(private readonly courtService: CourtService) {}
 
+  
+  // @Get()
+  // findCourtPrice(@Query('price') price?: string) {
+  //   if (!price) {
+  //     return this.courtService.findAll();
+  //   }
+
+  //   return this.courtService.findCourtPrice(Number(price));
+  // }
+
   @Get()
-  findAll() {
-    return this.courtService.findAll();
+  findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+    return this.courtService.findAll({ page, limit });
   }
+
 
   @Get('/:id')
   findOne(@Param('id') id: number) {
@@ -74,7 +86,11 @@ export class CourtController {
 
   @Patch('/update/:id')
   @UseInterceptors(FilesInterceptor('files', 6))
-  update(@Param() id: number, @Body() data: any, @UploadedFiles() files: Express.Multer.File[]) {
+  update(
+    @Param() id: number,
+    @Body() data: any,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
     return this.courtService.update(id, data, files);
   }
 

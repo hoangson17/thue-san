@@ -3,7 +3,7 @@ import {
   getProducts,
   getProductsByCategory,
 } from "@/stores/actions/productActions";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 
@@ -13,32 +13,35 @@ import {
   NavigationMenuList,
   NavigationMenuLink,
 } from "@/components/ui/navigation-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Store = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [page, setPage] = useState(1);
   const { products, productsByCategory } = useSelector(
     (state: any) => state.products
   );
 
   const params = new URLSearchParams(location.search);
-  const category = params.get("category");
+  const category = params.get("category") || "";
+  console.log(category);
 
   useEffect(() => {
-    if (category) {
-      dispatch(getProductsByCategory(category) as any);
-    } else {
-      dispatch(getProducts() as any);
-    }
-  }, [category, dispatch]);
-
+    dispatch(getProducts(page, category) as any);
+  }, [category, dispatch, page]);
   const handleCategoryChange = (category: string) => {
     navigate(`/products?category=${category}`);
   };
-
-  const dataToRender = category ? productsByCategory : products;
+  console.log(products.data);
 
   const categories = [
     { label: "Nước", value: "nước" },
@@ -52,7 +55,12 @@ const Store = () => {
         <NavigationMenu className="mb-5">
           <NavigationMenuList className="flex gap-2 bg-white border rounded-xl p-1 shadow-sm">
             <NavigationMenuItem>
-              <NavigationMenuLink className="px-4 py-2 rounded-lg font-medium cursor-pointer transition-all" onClick={() => navigate("/products")}>All</NavigationMenuLink>
+              <NavigationMenuLink
+                className="px-4 py-2 rounded-lg font-medium cursor-pointer transition-all"
+                onClick={() => navigate("/products")}
+              >
+                All
+              </NavigationMenuLink>
             </NavigationMenuItem>
             {categories.map((cat) => {
               const active = category === cat.value;
@@ -77,11 +85,49 @@ const Store = () => {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="grid grid-cols-4 gap-4">
-          {dataToRender?.map((product: any) => (
-            <ProductItem key={product.id} item={product} />
-          ))}
+        <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
+          {Array.isArray(products?.data) &&
+            products.data.map((product: any) => (
+              <ProductItem key={product.id} item={product} />
+            ))}
         </div>
+      </div>
+      <div className="mt-[40px]">
+        {products.pagination && (
+          <Pagination className="mt-6">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => page > 1 && setPage(page - 1)}
+                />
+              </PaginationItem>
+
+              {Array.from({ length: products.pagination.totalPages }).map(
+                (_, index) => {
+                  const pageNumber = index + 1;
+                  return (
+                    <PaginationItem key={pageNumber}>
+                      <PaginationLink
+                        isActive={page === pageNumber}
+                        onClick={() => setPage(pageNumber)}
+                      >
+                        {pageNumber}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                }
+              )}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    page < products.pagination.totalPages && setPage(page + 1)
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
     </div>
   );

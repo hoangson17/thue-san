@@ -6,8 +6,45 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { motion } from "framer-motion";
+import { supportService } from "@/services/supportService";
+import { toast } from "sonner";
 
 const Contact = () => {
+  const [data, setData] = React.useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSend = async () => {
+    try {
+      await supportService.createSupport(data);
+
+      toast.success("Gửi thông tin thành công");
+
+      setData({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Lỗi khi gửi thông tin");
+    }
+  };
+
   return (
     <div className="relative px-6 md:px-16 py-14 max-w-7xl mx-auto">
       <div className="absolute inset-0 -z-10 from-primary/5 via-transparent to-secondary/10" />
@@ -18,7 +55,9 @@ const Contact = () => {
         transition={{ duration: 0.5 }}
         className="text-center mb-14"
       >
-        <h1 className="text-4xl font-bold tracking-tight">Liên hệ Hoàng Sơn Sport</h1>
+        <h1 className="text-4xl font-bold tracking-tight">
+          Liên hệ Hoàng Sơn Sport
+        </h1>
         <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
           Chúng tôi luôn sẵn sàng hỗ trợ bạn về đặt sân, giải đấu và hợp tác.
           Hãy để lại thông tin, đội ngũ sẽ phản hồi sớm nhất.
@@ -52,7 +91,9 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="font-medium">Email</p>
-                  <p className="text-muted-foreground">contact@hoangsonsport.vn</p>
+                  <p className="text-muted-foreground">
+                    contact@hoangsonsport.vn
+                  </p>
                 </div>
               </div>
 
@@ -62,7 +103,9 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="font-medium">Địa chỉ</p>
-                  <p className="text-muted-foreground">Hoàng Sơn Sport, Hà Giang</p>
+                  <p className="text-muted-foreground">
+                    Hoàng Sơn Sport, Hà Giang
+                  </p>
                 </div>
               </div>
 
@@ -87,30 +130,52 @@ const Contact = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Họ và tên</Label>
-                  <Input id="name" placeholder="Nguyễn Văn A" />
+                  <Input
+                    id="name"
+                    name="name"
+                    value={data.name}
+                    onChange={handleChange}
+                    placeholder="Nguyễn Văn A"
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Số điện thoại</Label>
-                  <Input id="phone" placeholder="0xxx xxx xxx" />
+                  <Input
+                    id="phone"
+                    name="phone"
+                    value={data.phone}
+                    onChange={handleChange}
+                    placeholder="0xxx xxx xxx"
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="example@email.com" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={data.email}
+                  onChange={handleChange}
+                  placeholder="example@email.com"
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="message">Nội dung</Label>
                 <Textarea
                   id="message"
+                  name="message"
+                  value={data.message}
+                  onChange={handleChange}
                   placeholder="Bạn cần hỗ trợ về đặt sân, giải đấu hay hợp tác?"
                   rows={5}
                 />
               </div>
 
-              <Button className="w-full gap-2 text-base">
+              <Button onClick={handleSend} className="w-full gap-2 text-base">
                 <Send className="w-4 h-4" />
                 Gửi liên hệ
               </Button>

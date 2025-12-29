@@ -33,7 +33,7 @@ const Header = () => {
     },
     {
       name: "Giải đấu",
-      link: "/tournament",
+      link: "/tournaments",
     },
     {
       name: "Thuê sân",
@@ -124,25 +124,29 @@ const Header = () => {
                   </Avatar>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="w-48 ml-35" sideOffset={5}>
+                <DropdownMenuContent className="w-50 ml-40" sideOffset={5}>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/profile">Profile</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings">Setting</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/team">Team</Link>
-                  </DropdownMenuItem>
-                  {
-                    user?.role === "admin" && (
+                  {user?.role === "admin" && (
                       <DropdownMenuItem asChild>
                         <Link to="/admin">Admin</Link>
                       </DropdownMenuItem>
-                    )
-                  }
+                    )}
+                  <DropdownMenuItem asChild>
+                    <Link to="/order-courts">Sân đã đặt</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/team">Giải đấu đã đăng kí</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/save-tournament">Giải đấu đã lưu</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings">Setting</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogout}

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Court } from 'src/entities/court.entity';
 import { CourtImage } from 'src/entities/courtImage.entity';
+import { CourtPricings } from 'src/entities/courtPricings.entity';
 import { CourtType } from 'src/entities/courtType.entity';
 import { Sport } from 'src/entities/sport.entity';
 import { In, Repository } from 'typeorm';
@@ -10,6 +11,7 @@ import { In, Repository } from 'typeorm';
 export class CourtService {
   constructor(
     @InjectRepository(Court) private courtRepository: Repository<Court>,
+    @InjectRepository(CourtPricings) private courtPricingsRepository: Repository<CourtPricings>,
     @InjectRepository(CourtType)
     private courtTypeRepository: Repository<CourtType>,
     @InjectRepository(CourtImage)
@@ -17,8 +19,14 @@ export class CourtService {
     @InjectRepository(Sport) private sportRepository: Repository<Sport>,
   ) {}
 
-  async findAll() {
-    return await this.courtRepository.find({
+  async findAll({ page, limit }: { page?: number; limit?: number }) {
+    if (!page || !limit) {
+      return await this.courtRepository.findAndCount();
+    }
+    return await this.courtRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'DESC' },
       relations: {
         images: true,
         court_type: {
@@ -115,4 +123,22 @@ export class CourtService {
       },
     });
   }
+
+  async findCourtPrice(price:number) {
+    return await this.courtPricingsRepository.find({
+      where:{price_per_hour: price},
+      relations: {
+        court: {
+          images: true,
+        },
+      },
+    });
+  }
+
+  createPrice(data: any) {
+    return this.courtPricingsRepository.save(data);
+  }
+
+
+
 }

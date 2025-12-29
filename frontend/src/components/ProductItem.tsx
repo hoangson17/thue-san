@@ -42,8 +42,7 @@ const ProductItem = ({ item }: { item: any }) => {
           <img
             src={`${import.meta.env.VITE_SERVER_API}${images[0]?.url}`}
             alt={item.name}
-            className="mx-auto rounded-xl"
-            width={150}
+            className="mx-auto h-40 object-cover rounded-xl"
           />
           <h1 className="font-semibold text-lg mt-2">{item.name}</h1>
         </div>

@@ -9,7 +9,7 @@ export class Toumament {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'text' })
   description: string;
 
   @Column({ type: 'text' })
@@ -17,6 +17,15 @@ export class Toumament {
 
   @Column({ type: 'varchar', length: 50 })
   price: string;
+
+  @Column({ type: 'varchar', length: 200 })
+  address: string;
+
+  @Column({ type: 'timestamp' , nullable: true})
+  start_date: Date;
+
+  @Column({ type: 'varchar', length: 50 })
+  organizer: string;
 
   @OneToMany(
     () => ToumamentImage,

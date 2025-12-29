@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -17,17 +19,27 @@ export class CourtPricings {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Court, (court) => court.court_pricings, {
+  @ManyToMany(() => Court, (court) => court.court_pricings, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'court_id' })
-  court: Court;
+  @JoinTable({
+    name: 'pricings',
+    joinColumn: {
+      name: 'court_pricings_id',
+      referencedColumnName: 'id', 
+    },
+    inverseJoinColumn: {
+      name: 'court_id',
+      referencedColumnName: 'id',
+    },
+  })
+  court: Court[];
 
   @Column({
     type: 'enum',
     enum: DayType,
     default: DayType.WEEKDAY,
-  }) 
+  })  
   dayType: DayType;
 
   @Column({ type: 'varchar', length: 100 })

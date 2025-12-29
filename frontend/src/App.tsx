@@ -1,31 +1,64 @@
-import { Route, Routes } from 'react-router-dom'
-import { HomePage , Home, Auth, Store, ProductDetail, Tournament, Contact, Court, CourtDetail } from './page/public'
-import Google from './page/public/Google'
-import { Toaster } from 'sonner'
+import { Route, Routes } from "react-router-dom";
+import {
+  HomePage,
+  Home,
+  Auth,
+  Store,
+  ProductDetail,
+  Tournament,
+  Contact,
+  Court,
+  CourtDetail,
+  TournamentDetail,
+  Profile,
+  Cart,
+} from "./page/public";
+import Google from "./page/public/Google";
+import { Toaster } from "sonner";
+import AuthMiddleware from "./middlewares/AuthMiddleware";
+import AdminMiddleware from "./middlewares/AdminMiddleware";
+import Admin from "./page/private/Admin";
+import AdminUsers from "./page/private/AdminUsers";
+import AdminCourts from "./page/private/AdminCourts";
+import AdminTournaments from "./page/private/AdminTournaments";
 
 function App() {
   return (
     <>
       <div>
         <Routes>
-        <Route path="/" element={<Home />}>
-          <Route index element={<HomePage />} />
-          <Route path='/products' element={<Store />} />
-          <Route path='/products?category=:category' element={<Store />} />
-          <Route path='/products/:id' element={<ProductDetail />} />
-          <Route path='/contact' element={<Contact />} />
-          <Route path='/tournament' element={<Tournament />} />
-          <Route path='/courts' element={<Court />} />
-          <Route path='/courts/:id' element={<CourtDetail />} />
-        </Route>
-          <Route path='/login' element={<Auth type="login" />} />
-          <Route path='/register' element={<Auth type="register" />} />
+          <Route path="/" element={<Home />}>
+            <Route index element={<HomePage />} />
+            <Route path="/products" element={<Store />} />
+            <Route path="/products?category=:category" element={<Store />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/tournaments" element={<Tournament />} />
+            <Route path="/tournaments/:id" element={<TournamentDetail />} />
+            <Route path="/courts" element={<Court />} />
+            <Route path="/courts/:id" element={<CourtDetail />} />
+            <Route element={<AuthMiddleware />}>
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/cart" element={<Cart />} />
+            </Route>
+          </Route>
+          <Route path="/login" element={<Auth type="login" />} />
+          <Route path="/register" element={<Auth type="register" />} />
           <Route path="/auth/google/callback" element={<Google />} />
+          <Route element={<AuthMiddleware />}>
+            <Route element={<AdminMiddleware />}>
+              <Route path="/admin" element={<Admin />}>
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="courts" element={<AdminCourts />} />
+                <Route path="tournaments" element={<AdminTournaments />} />
+              </Route>
+            </Route>
+          </Route>
         </Routes>
         <Toaster position="top-center" />
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

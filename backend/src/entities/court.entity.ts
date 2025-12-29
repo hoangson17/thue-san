@@ -1,4 +1,4 @@
-import { Column, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { CourtType } from "./courtType.entity";
 import { CourtPricings } from "./courtPricings.entity";
 import { MonthlySlots } from "./monthlySlots.entity";
@@ -14,7 +14,7 @@ export class Court {
     @JoinColumn({name: 'court_type'})
     court_type: CourtType
 
-    @OneToMany(()=>CourtPricings, court_pricings => court_pricings.court)
+    @ManyToMany(()=>CourtPricings, court_pricings => court_pricings.court)
     court_pricings: CourtPricings[];
 
     @OneToMany(()=>MonthlySlots, monthly_slots => monthly_slots.court)

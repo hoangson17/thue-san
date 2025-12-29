@@ -7,7 +7,7 @@ const initialState = {
     error: null,
 };
 
-const courtReducer = (state = initialState, action: any) => {
+const courtReducer = (state = initialState, action: any) => {    
     switch (action.type) {
         case actionTypes.GET_COURT_REQUEST:
             return { ...state, loading: true, error: null }
