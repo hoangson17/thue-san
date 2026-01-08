@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductImage } from 'src/entities/productImage.entity';
 import { Products } from 'src/entities/products.entity';
-import { In, IsNull, Not, Repository } from 'typeorm';
+import { In, IsNull, Like, Not, Repository } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
@@ -13,36 +13,37 @@ export class ProductsService {
     private readonly productImageRepository: Repository<ProductImage>,
   ) {}
 
-  async findAll({ page = 1, limit = 10, category, }: {
+  async findAll({
+    page = 1,
+    limit = 10,
+    category,
+    search,
+  }: {
     page?: number;
     limit?: number;
     category?: string;
+    search?: string;
   }) {
     const where: any = {};
     if (category) {
-      where.category = category;
+      where.category = { name: category };
     }
-
+    if (search) {
+      where.name = Like(`%${search}%`);
+    }
     return this.productsRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
       where,
-      relations: ['images'],
+      relations: ['images', 'category'],
       order: { createdAt: 'DESC' },
-    });
-  }
-
-  async findByCategory(category: string) {
-    return this.productsRepository.find({
-      where: { category },
-      relations: ['images'],
     });
   }
 
   async findOne(id: number) {
     return await this.productsRepository.findOne({
       where: { id },
-      relations: ['images'],
+      relations: ['images', 'category'],
     });
   }
 

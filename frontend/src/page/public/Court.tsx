@@ -10,17 +10,15 @@ const Court = () => {
   const [page, setPage] = React.useState(1);
 
   useEffect(() => {
-    dispatch(getCourts(page) as any);
+    dispatch(getCourts(page, "desc") as any);
   }, [dispatch, page]);
-
-  console.log(courts);
 
   return (
     <div className="px-16 py-10 max-w-7xl mx-auto">
       <div className='text-center mb-7'><h1 className='mx-auto text-3xl font-bold uppercase'>Các sân hiện có</h1></div>
       <ListCourt items={courts.data} />
       <div className="mt-[40px]">
-        {courts.pagination && (
+        {courts.pagination && courts.pagination.totalPages > 1 && (
                 <Pagination className="mt-6">
                   <PaginationContent>
                     <PaginationItem>

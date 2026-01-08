@@ -2,6 +2,11 @@ import actionTypes from "../actions/actionTypes";
 
 const initialState = {
   user: null,
+  allUser: [] as any[],
+  lockUser: [] as any[],
+  userDetail: {},
+  accessToken: null,
+  refreshToken: null,
   loading: false,
   error: null,
   isAuthenticated: false,
@@ -10,11 +15,7 @@ const initialState = {
 const authReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case actionTypes.LOGIN_REQUEST:
-      return {
-        ...state,
-        loading: true,
-        error: null,
-      };
+      return { ...state, loading: true, error: null };
 
     case actionTypes.LOGIN_SUCCESS:
       return {
@@ -22,24 +23,63 @@ const authReducer = (state = initialState, action: any) => {
         loading: false,
         isAuthenticated: true,
         user: action.payload.user,
-      };
-
-    case actionTypes.LOGIN_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        isAuthenticated: false,
-        error: action.payload,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
       };
 
     case actionTypes.REGISTER_SUCCESS:
       return {
         ...state,
         loading: false,
+        isAuthenticated: false,
+        user: action.payload.user,
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
       };
 
+    case actionTypes.LOGIN_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
     case actionTypes.LOGOUT:
-      return initialState;
+      return {
+        ...state,
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+        isAuthenticated: false,
+      };
+
+    case actionTypes.UPDATE_USER_REQUEST:
+      return { ...state, loading: true, error: null };
+
+    case actionTypes.UPDATE_USER_SUCCESS:
+      return { ...state, loading: false, user: action.payload };
+
+    case actionTypes.UPDATE_USER_FAILURE:
+      return { ...state, loading: false, error: action.payload };
+
+    case actionTypes.SET_PROFILE:
+      return { ...state, user: action.payload };
+    case actionTypes.GET_ONE_USER_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+
+    case actionTypes.GET_ONE_USER_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        userDetail: action.payload,
+      };
+
+    case actionTypes.GET_ONE_USER_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
 
     default:
       return state;

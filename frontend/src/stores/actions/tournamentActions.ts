@@ -2,11 +2,11 @@ import actionTypes from "./actionTypes";
 import { tournamentService } from "../../services/tournamentService";
 import { toast } from "sonner";
 
-export const getTournament = (page: number) => async (dispatch: any) => {
+export const getTournament = (page: number, desc?: string, search?: string) => async (dispatch: any) => {
   dispatch({ type: actionTypes.GET_TOURNAMENT_REQUEST });
   const limit = import.meta.env.VITE_PAGE_LIMIT;
   try {
-    const response = await tournamentService.getTournament(page, limit);
+    const response = await tournamentService.getTournament(page, limit, desc, search);
     dispatch({
       type: actionTypes.GET_TOURNAMENT_SUCCESS,
       payload: {

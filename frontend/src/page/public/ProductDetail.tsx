@@ -7,22 +7,40 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { cartService } from "@/services/cartService";
+import { getCart } from "@/stores/actions/cartActions";
 import { getProductDetail } from "@/stores/actions/productActions";
+import { CreditCard, ShoppingCart } from "lucide-react";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { toast } from "sonner";
 
 const ProductDetail = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { productDetail } = useSelector((state: any) => state.products);
   const id = location.pathname.split("/")[2];
+  const [quantity, setQuantity] = React.useState(1);
+  
 
   useEffect(() => {
     dispatch(getProductDetail(id) as any);
   }, [dispatch, id]);
 
   const images = productDetail?.images ?? [];
+
+  // console.log(productDetail);
+  
+  const handleAddToCart = async (id: string) => {
+    try {
+      await cartService.addToCart({ productId: id, quantity });
+      toast.success("Thêm vào giỏ hàng thành công");
+      dispatch(getCart() as any);
+    } catch (error) {
+      toast.error("Lỗi khi thêm vào giỏ hàng");
+    }
+  };
 
   return (
     <div className="px-16 py-10 max-w-7xl mx-auto">
@@ -45,7 +63,6 @@ const ProductDetail = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-
             <CarouselPrevious className="left-2" />
             <CarouselNext className="right-2" />
           </Carousel>
@@ -57,7 +74,7 @@ const ProductDetail = () => {
               <div className="border-b-2 border-gray-300 pb-2">
                 <p className="text-2xl font-semibold">{productDetail?.name}</p>
                 <p className="text-sm text-muted-foreground bg-gray-100 inline-block px-3 py-1 rounded-full">
-                  {productDetail?.category}
+                  {productDetail?.category?.name}
                 </p>
               </div>
               <p className="text-3xl font-bold text-gray-400">
@@ -74,10 +91,11 @@ const ProductDetail = () => {
                   : "Hết hàng"}
               </p>
               <div className="flex flex-col md:flex-row gap-3 pt-3">
-                <Button className="px-6 text-lg">Mua ngay</Button>
-                <Button variant="outline" className="px-6 text-lg">
-                  Thêm vào giỏ hàng
+                <Button onClick={() => {handleAddToCart(id)}} variant="outline" className="px-6 text-lg">
+                  <ShoppingCart className="mr-2 h-4 w-4" /> Thêm về giỏ hàng
                 </Button>
+                <Button className="px-6 text-lg"><CreditCard className="mr-2 h-4 w-4" /> Mua ngay </Button>
+
               </div>
             </CardContent>
           </Card>

@@ -4,12 +4,17 @@ export const productService = {
   getProducts: async (
     page: number = 1,
     limit: number = 10,
-    category?: string
+    category?: string,
+    search?: string
   ) => {
     const params: any = { page, limit };
 
     if (category) {
       params.category = category;
+    }
+
+    if (search) {
+      params.search = search;
     }
 
     return axiosInstance.get("/products", { params });
@@ -24,7 +29,7 @@ export const productService = {
     const response = await axiosInstance.get("/products", {
       params: {
         category,
-        t: Date.now(), // chống cache
+        t: Date.now(),
       },
     });
     return response.data;

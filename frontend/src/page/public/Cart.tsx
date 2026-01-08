@@ -11,14 +11,13 @@ const Cart = () => {
     dispatch(getCart() as any);
   }, [dispatch]);
 
-  console.log(cart);
-  
+  // console.log(cart);
 
   return (
     <div className='w-full max-w-7xl m-auto md:px-16 py-10'>
       <div className='text-2xl font-semibold'>Giỏ hàng</div>
       <div>
-        {/* <ListCart products={} /> */}
+        <ListCart products={cart} />
       </div>
     </div>
   )

@@ -3,14 +3,19 @@ import { productService } from "../../services/productService";
 import { toast } from "sonner";
 
 export const getProducts =
-  (page: number = 1, category: string = "") =>
+  (page: number = 1, category: string = "", search: string = "") =>
   async (dispatch: any) => {
     dispatch({ type: actionTypes.GET_PRODUCTS_REQUEST });
 
     const limit = Number(import.meta.env.VITE_PAGE_LIMIT);
 
     try {
-      const response = await productService.getProducts(page, limit, category);
+      const response = await productService.getProducts(
+        page,
+        limit,
+        category,
+        search
+      );
 
       dispatch({
         type: actionTypes.GET_PRODUCTS_SUCCESS,

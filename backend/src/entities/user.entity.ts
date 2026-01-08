@@ -1,8 +1,9 @@
-import { Column, DeleteDateColumn, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
+import { Column, DeleteDateColumn, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne, ManyToMany, JoinTable } from "typeorm";
 import { MonthlySlots } from "./monthlySlots.entity";
 import { Booking } from "./booking.entity";
 import { MonthlyBooking } from "./monthyBooking.entity";
 import { Cart } from "./cart.entity";
+import { Toumament } from "./toumament.entity";
 
 export enum UserRole {
     USER = 'user',
@@ -46,8 +47,11 @@ export class User {
     @OneToMany(()=>MonthlyBooking, monthly_booking => monthly_booking.user)
     monthly_bookings: MonthlyBooking[];
     
-    @OneToMany(() => Cart, cart => cart.user)
-    carts: Cart[];
+    @OneToOne(() => Cart, cart => cart.user) 
+    cart: Cart; 
+
+    @ManyToMany(()=>Toumament, (toumament) => toumament.users)
+    toumaments: Toumament[]; 
 
     @Column({ type: 'varchar', nullable: true })
     avatar: string;

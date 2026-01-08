@@ -18,6 +18,8 @@ import { ToumamentModule } from './modules/toumament/toumament.module';
 import { SupportModule } from './modules/support/support.module';
 import { UsersModule } from './modules/users/users.module';
 import { CartModule } from './modules/cart/cart.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { PricesModule } from './modules/prices/prices.module';
 
 @Module({
   imports: [
@@ -63,6 +65,8 @@ import { CartModule } from './modules/cart/cart.module';
     SupportModule,
     UsersModule,
     CartModule,
+    CategoriesModule,
+    PricesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

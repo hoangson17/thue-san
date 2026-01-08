@@ -4,7 +4,8 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Toumament } from 'src/entities/toumament.entity';
 import { ToumamentImage } from 'src/entities/toumamentImage.entity';
-import { Repository } from 'typeorm';
+import { User } from 'src/entities/user.entity';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class ToumamentService {
@@ -13,26 +14,52 @@ export class ToumamentService {
     private toumamentRepository: Repository<Toumament>,
     @InjectRepository(ToumamentImage)
     private toumamentImageRepository: Repository<ToumamentImage>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  findAll({ page, limit }: { page?: number; limit?: number }) {
-    if (!page || !limit) {
-      return this.toumamentRepository.findAndCount();
+  async findAll({
+    page = 1,
+    limit = 10,
+    order = 'DESC',
+    search,
+  }: {
+    page?: number;
+    limit?: number;
+    order?: 'ASC' | 'DESC' | string;
+    search?: string;
+  }) {
+    const where: any = {};
+    if (search) {
+      where.name = Like(`%${search}%`);
     }
-
     return this.toumamentRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      relations: { images: true },
-      order: { createdAt: 'DESC' },
-    })
+      where,
+      relations: {
+        images: true,
+        users: true,
+      },
+      order: { createdAt: order as any },
+    });
   }
 
+  // findOne(id: number) {
+  //   return this.toumamentRepository.findOne({
+  //     where: { id },
+  //     relations: {
+  //       images: true,
+  //       users: true,
+  //     },
+  //   });
+  // }
   findOne(id: number) {
-    return this.toumamentRepository.findOne({
-      where: { id },
-      relations: { images: true },
-    });
+    return this.toumamentRepository
+      .createQueryBuilder('toumament')
+      .leftJoinAndSelect('toumament.images', 'images')
+      .leftJoinAndSelect('toumament.users', 'users')
+      .where('toumament.id = :id', { id })
+      .getOne();
   }
 
   async create(data: any, files: Express.Multer.File[]) {
@@ -90,5 +117,26 @@ export class ToumamentService {
 
   restore(id: number) {
     return this.toumamentRepository.restore(id);
+  }
+
+  async toumamentRegister(toumamentId: number, userId: number) {
+    const toumament = await this.toumamentRepository.findOne({
+      where: { id: toumamentId },
+      relations: ['users'],
+    });
+    if (!toumament) {
+      throw new Error('Toumament not found');
+    }
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    delete (user as any).password;
+    return this.toumamentRepository.save({
+      ...toumament,
+      users: [...toumament.users, user],
+    });
   }
 }

@@ -11,11 +11,14 @@ import {
   Request,
   Res,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import { AuthGuard } from 'src/guard/auth/auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 export class AuthController {
@@ -78,17 +81,21 @@ export class AuthController {
   }
 
   @Patch('/profile')
-  async updateUser(@Request() req: any, @Body() body: any) {
-    const data = await this.authService.updateUser(req.user, body);
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async updateUser(
+    @Request() req: any,
+    @Body() body: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const data = await this.authService.updateUser(req.user, body, file);
     if (!data) {
       return {
         success: false,
-        message: 'Email da ton tai',
+        message: 'Email đã tồn tại',
       };
     }
-    return {
-      success: true,
-      data: data,
-    };
+
+    return data;
   }
 }

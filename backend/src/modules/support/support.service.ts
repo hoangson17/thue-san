@@ -11,8 +11,17 @@ export class SupportService {
         return await this.supportRepository.save(body);
     }
 
-    async getSupport() {
-        return await this.supportRepository.find();
+    async getSupport({ page, limit, order }: { page?: number; limit?: number, order?: string }) {
+        console.log(page,limit,order);
+        
+        if(!page || !limit) {
+            return await this.supportRepository.find();
+        }
+        return await this.supportRepository.findAndCount({
+            skip: (page - 1) * limit,
+            take: limit,
+            order: { id: order as any },
+        });
     }
 
     async deleteSupport(id: number) {

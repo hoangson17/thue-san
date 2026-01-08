@@ -17,10 +17,9 @@ const Tournament = () => {
   const { tournaments } = useSelector((state: any) => state.tournaments);
   const [page, setPage] = React.useState(1);
   useEffect(() => {
-    dispatch(getTournament(page) as any);
+    dispatch(getTournament(page,"desc") as any);
   }, [dispatch,page]);
 
-  console.log(tournaments);
 
   return (
     <div className="px-16 py-10 max-w-7xl mx-auto">
@@ -31,7 +30,7 @@ const Tournament = () => {
       </div>
       <ListTournament items={tournaments.data} />
       <div className="mt-[40px]">
-        {tournaments.pagination && (
+        {tournaments.pagination && tournaments.pagination.totalPages > 1 && (
                 <Pagination className="mt-6">
                   <PaginationContent>
                     <PaginationItem>

@@ -18,19 +18,20 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-@Get()
-async getProducts(
-  @Query('page') page?: string,
-  @Query('limit') limit?: string,
-  @Query('category') category?: string,
-) {
-  return this.productsService.findAll({
-    page: page ? Number(page) : 1,
-    limit: limit ? Number(limit) : 10,
-    category,
-  });
-}
-
+  @Get()
+  async getProducts(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('category') category?: string,
+    @Query('search') search?: string, // thêm search
+  ) {
+    return this.productsService.findAll({
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 10,
+      category,
+      search,
+    });
+  }
 
   @Get(':id')
   findOne(@Param('id') id: number) {

@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import Redis from 'ioredis';
+import { Cart } from 'src/entities/cart.entity';
 import { User } from 'src/entities/user.entity';
 import Hash from 'src/utils/Hash';
 import { Not, Repository } from 'typeorm';
@@ -20,6 +21,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
+    @InjectRepository(Cart) private cartRepository: Repository<Cart>,
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
@@ -75,6 +77,8 @@ export class AuthService {
         email,
         avatar: picture,
       });
+      const cart = this.cartRepository.create({ user: user } as any);
+      await this.cartRepository.save(cart);
     }
     return this.createToken(user);
   }
@@ -155,7 +159,7 @@ export class AuthService {
     return { success: true };
   }
 
- async createToken(user: any) {
+  async createToken(user: any) {
     const jtiAccessToken = uuid();
     const token = this.jwtService.sign({
       jti: jtiAccessToken,
@@ -210,22 +214,28 @@ export class AuthService {
     };
   }
 
-  
   async register(body: any) {
     const { email, password, name, phone } = body;
 
-    const mail = await this.userRepository.findOne({
+    const existingEmail = await this.userRepository.findOne({
       where: { email },
     });
-    const phones = await this.userRepository.findOne({
+    const existingPhone = await this.userRepository.findOne({
       where: { phone },
     });
 
-    if (mail) throw new BadRequestException('Email đã được sử dụng');
-    if (phones) throw new BadRequestException('Số điện thoại đã được sử dụng');
-    body.password = Hash.make(body.password);
+    if (existingEmail) throw new BadRequestException('Email đã được sử dụng');
+    if (existingPhone)
+      throw new BadRequestException('Số điện thoại đã được sử dụng');
+
+    body.password = await Hash.make(password);
+
     const newUser = this.userRepository.create(body);
     const user = await this.userRepository.save(newUser);
+
+    const cart = this.cartRepository.create({ user: user } as any);
+    await this.cartRepository.save(cart);
+
     delete (user as any).password;
     return user;
   }
@@ -240,84 +250,40 @@ export class AuthService {
     if (!Hash.compare(body.password, user.password)) {
       return false;
     }
-    const jtiAccessToken = uuid();
-    const token = this.jwtService.sign({
-      jti: jtiAccessToken,
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-    const jtiRefreshToken = uuid();
-    const refreshToken = this.jwtService.sign(
-      {
-        jti: jtiRefreshToken,
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      {
-        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRED as unknown as number,
-        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
-      },
-    );
-
-    const { exp: expAccessToken } = this.verifyToken(token);
-    const { exp: expRefreshToken } = this.verifyRefreshToken(refreshToken);
-    await this.redis.set(
-      `jwt_refresh_${jtiRefreshToken}`,
-      JSON.stringify({
-        jtiAccessToken,
-        exp: expAccessToken,
-        userId: user.id,
-      }),
-      'EX',
-      Math.round(expRefreshToken - Date.now() / 1000),
-    );
-    await this.redis.set(
-      `Device_${user.id}`,
-      jtiAccessToken,
-      'EX',
-      Math.round(expAccessToken - Date.now() / 1000),
-    );
-    await this.redis.keys(`jwt_refresh_*`);
-
-    delete (user as any).password;
-
-    return {
-      accessToken: token,
-      refreshToken,
-      user,
-    };
+    return this.createToken(user);
   }
 
-  async updateUser(user: any, data: any) {
-    const id = user.id;
-    const email = data.email;
-    const emailExits = await this.userRepository.findOne({
-      where: {
-        email,
-        id: Not(id),
-      },
-    });
-    if (emailExits) return false;
-    const userUpdata = {
-      ...user,
-      ...data,
-    };
-    if (data.password) {
-      userUpdata.password = Hash.make(data.password);
-    }
-    await this.userRepository.save(userUpdata);
-    return userUpdata;
+  async updateUser(user: any, data: any, file?: Express.Multer.File) {
+  const userExist = await this.userRepository.findOne({ where: { id: user.id } });
+  if (!userExist) return null;
+
+  if (data.email && data.email !== userExist.email) {
+    const emailExist = await this.userRepository.findOne({ where: { email: data.email } });
+    if (emailExist) return null;
   }
 
-  async updateProfile(id: number, data: any) {
-    if (data.password) {
-      data.password = await Hash.make(data.password);
-    }
-
-    await this.userRepository.update(id, data);
-
-    return await this.userRepository.findOne({ where: { id } });
+  if (data.phone && data.phone !== userExist.phone) {
+    const phoneExist = await this.userRepository.findOne({ where: { phone: data.phone } });
+    if (phoneExist) return null;
   }
+
+  const updateData = data;
+
+  if (file) {
+    updateData.avatar = `/uploads/avatar/${file.filename}`;
+  }
+
+  if (data.password) {
+    updateData.password = await Hash.make(data.password);
+  }
+
+  await this.userRepository.update(user.id, updateData);
+
+  const updatedUser = await this.userRepository.findOne({ where: { id: user.id } });
+  if (!updatedUser) return null;
+
+  delete (updatedUser as any).password;
+  return updatedUser;
+}
+
 }

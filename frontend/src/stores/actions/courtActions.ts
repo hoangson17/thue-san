@@ -1,12 +1,12 @@
 import { courtService } from "@/services/courtService";
 import actionTypes from "./actionTypes";
 
-export const getCourts = (page?: number) => async (dispatch: any) => {
+export const getCourts = (page?: number,order?: string, search?: string) => async (dispatch: any) => {
   dispatch({ type: actionTypes.GET_COURT_REQUEST });
   const limit = import.meta.env.VITE_PAGE_LIMIT;
   try {
-    const response = await courtService.getCourt(page, limit);    
-    console.log(response);
+    const response = await courtService.getCourt(page, limit, order, search);    
+    // console.log(response);
     
     dispatch({
       type: actionTypes.GET_COURT_SUCCESS,

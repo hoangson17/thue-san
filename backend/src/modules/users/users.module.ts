@@ -4,6 +4,7 @@ import { UsersController } from './users.controller';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   controllers: [UsersController],
@@ -13,6 +14,7 @@ import { User } from 'src/entities/user.entity';
       isGlobal: true
     }),
     TypeOrmModule.forFeature([User]),
+    AuthModule
   ],
 })
 export class UsersModule {}

@@ -1,18 +1,15 @@
 import * as React from "react"
 import {
-  IconCamera,
+  IconAdCircle,
+  IconBellDollar,
+  IconCategory,
   IconChartBar,
   IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
+  IconEyeDollar,
   IconInnerShadowTop,
-  IconListDetails,
+  IconMapPinDollar,
+  IconPackage,
   IconReport,
-  IconSearch,
   IconSettings,
   IconUsers,
 } from "@tabler/icons-react"
@@ -31,71 +28,39 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useSelector } from "react-redux"
+import { Link } from "react-router-dom"
 
 const data = {
   navMain: [
     {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
-    {
-      title: "Tounaments",
+      title: "Giải đấu",
       url: "/admin/tournaments",
       icon: IconChartBar,
+    },
+    {
+      title: "Quản lý sân",
+      url: "/admin/courts",
+      icon: IconAdCircle ,
     },
     {
       title: "Users",
       url: "/admin/users",
       icon: IconUsers,
     },
-  ],
-  navClouds: [
     {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Products",
+      url: "/admin/products",
+      icon: IconPackage,
     },
     {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Categories",
+      url: "/admin/categories",
+      icon: IconCategory,
     },
     {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Prices",
+      url: "/admin/prices",
+      icon: IconMapPinDollar,
     },
   ],
   navSecondary: [
@@ -103,11 +68,6 @@ const data = {
       title: "Settings",
       url: "#",
       icon: IconSettings,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
     },
   ],
   documents: [
@@ -130,10 +90,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <Link to="/admin" className="hover:bg-transparent">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">Quản lý sân</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

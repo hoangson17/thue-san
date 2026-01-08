@@ -12,7 +12,15 @@ export const authService = {
   register: (body: any) => axiosInstance.post("/auth/register", body),
 
   logout: () => {
-    axiosInstance.post("/auth/logout",{},{headers: {Authorization: `Bearer ${localStorage.getItem("accessToken")}`}});
+    axiosInstance.post(
+      "/auth/logout",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }
+    );
     localStorage.removeItem("persist:auth");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -35,21 +43,43 @@ export const authService = {
     return axiosInstance.post("/auth/reset-password", data);
   },
 
-  updateProfile(userId: number, formData: FormData) {
-    return axiosInstance.patch(`/user/${userId}`, formData, {
+  updateProfile(formData: FormData) {
+    return axiosInstance.patch("/auth/profile", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
   },
-
-  getAllUsers:async (page: number) =>
-    await axiosInstance.get("/users", {
+  findAllUsers: async (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+    order?: "ASC" | "DESC";
+  }) => {
+    const res = await axiosInstance.get("/users/all", {
       params: {
-        page,
-        limit:import.meta.env.VITE_PAGE_LIMIT,
+        page: params.page,
+        limit: params.limit,
+        search: params.search,
+        role: params.role,
+        order: params.order,
       },
-    }),
+    });
+    console.log(res.data);
+    
+    return res.data;
+  },
+
+  findOneUser: async () => {
+    const res = await axiosInstance.get("/users", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    });
+    return res.data;
+  },
 
   deleteUser: (id: number) =>
     axiosInstance.delete(`/user/${id}`, {
@@ -62,7 +92,7 @@ export const authService = {
   restoreUser: (id: number) =>
     axiosInstance.patch(
       `/user/restore/${id}`,
-      {}, // body rỗng
+      {},
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

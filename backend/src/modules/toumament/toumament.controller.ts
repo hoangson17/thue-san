@@ -19,12 +19,12 @@ export class ToumamentController {
   constructor(private readonly toumamentService: ToumamentService) {}
 
   @Get()
-  findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
-      return this.toumamentService.findAll({ page, limit });
+  findAll(@Query('page') page?: number, @Query('limit') limit?: number, @Query('order') order?: string, @Query('search') search?: string) {
+      return this.toumamentService.findAll({ page, limit, order, search });
   }
 
   @Get(':id')
-  findOne(id: number) {
+  findOne(@Param('id') id: number) {
     return this.toumamentService.findOne(id);
   }
 

@@ -1,10 +1,14 @@
 import React from 'react'
 import CartItem from './CartItem'
 
-const ListCart = ({products}:any) => {
+const ListCart = ({ products = [] }: any) => {
   return (
     <div>
-        {products.map((product:any) => (<CartItem product={product} />))}
+      {products.map((cart: any) =>
+        cart.items.map((item: any) => (
+          <CartItem key={item.id} product={item} />
+        ))
+      )}
     </div>
   )
 }

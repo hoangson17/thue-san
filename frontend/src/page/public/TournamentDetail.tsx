@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { tournamentService } from "@/services/tournamentService";
+import { toast } from "sonner";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -18,17 +20,29 @@ const fadeUp = {
   transition: { duration: 0.4 },
 };
 
-
 const TournamentDetail = () => {
   const dispatch = useDispatch();
   const id = window.location.pathname.split("/")[2];
   const { tournamentDetail } = useSelector((state: any) => state.tournaments);
+  const { user } = useSelector((state: any) => state.auth);
+  const isRegistered = tournamentDetail?.users?.some(
+    (u: any) => u.id === user?.id
+  );
 
   useEffect(() => {
     dispatch(getTournamentDetail(id as unknown as number) as any);
   }, [dispatch, id]);
 
-  // console.log(tournamentDetail);
+  console.log(tournamentDetail);
+  const handleRegister = async (id: number) => {
+    try {
+      await tournamentService.tournamentRegister(id);
+      dispatch(getTournamentDetail(id as unknown as number) as any)
+      toast.success("Đăng ký thành công");
+    } catch (err) {
+      toast.error("Lỗi khi đăng ký");
+    }
+  };
 
   return (
     <div>
@@ -57,20 +71,37 @@ const TournamentDetail = () => {
             </Carousel>
           </div>
           <div className="w-full md:max-w-5/12 ml-4 flex flex-col gap-3">
-            <h1 className="text-3xl font-bold">
-              {tournamentDetail?.name}
-            </h1>
-            <p className="text-xl font-medium">Tổng giải thưởng: <b className="text-red-500">{tournamentDetail?.price} vnđ</b></p>
+            <h1 className="text-3xl font-bold">{tournamentDetail?.name}</h1>
+            <p className="text-xl font-medium">
+              Tổng giải thưởng:{" "}
+              <b className="text-red-500">{tournamentDetail?.price} vnđ</b>
+            </p>
             <p className="text-justify">{tournamentDetail?.description}</p>
             <b>
-              Ngày bắt đầu: {new Date(tournamentDetail?.start_date).toLocaleDateString("vi-VN")}
+              Ngày bắt đầu:{" "}
+              {new Date(tournamentDetail?.start_date).toLocaleDateString(
+                "vi-VN"
+              )}
             </b>
             <b>Địa điểm tổ chức: {tournamentDetail?.address}</b>
             <p>Đơn vị tổ chức: {tournamentDetail?.organizer}</p>
             <div className="w-full grid grid-cols-2 gap-4 ">
-              <Button className="text-white py-2 px-4 rounded-md cursor-pointer">
-                Đăng ký
-              </Button>
+              {!isRegistered ? (
+                <Button
+                  onClick={() => handleRegister(id as unknown as number)}
+                  className="text-white py-2 px-4 rounded-md cursor-pointer"
+                >
+                  Đăng ký
+                </Button>
+              ) : (
+                <Button
+                  disabled
+                  className="bg-gray-400 text-white py-2 px-4 rounded-md cursor-not-allowed"
+                >
+                  Đã đăng ký
+                </Button>
+              )}
+
               <Button className="text-black bg-white border border-black hover:bg-gray-900 hover:text-white cursor-pointer py-2 px-4 rounded-md">
                 Lưu lại
               </Button>
@@ -78,31 +109,33 @@ const TournamentDetail = () => {
           </div>
         </div>
         <div>
-        {" "}
-        <motion.div {...fadeUp}>
-          <Card className="rounded-2xl">
-            <CardContent>
-              <h3 className="text-xl font-bold">Mô tả chi tiết</h3>
-              {tournamentDetail.details ? (
-                <div
-                  className="
+          {" "}
+          <motion.div {...fadeUp}>
+            <Card className="rounded-2xl">
+              <CardContent>
+                <h3 className="text-xl font-bold">Mô tả chi tiết</h3>
+                {tournamentDetail.details ? (
+                  <div
+                    className="
                     text-sm leading-relaxed space-y-2
                     [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-4
                     [&_h4]:text-base [&_h4]:font-semibold [&_h4]:mt-3
                     [&_ul]:list-disc [&_ul]:pl-5
                     [&_li]:mb-1
                   "
-                  dangerouslySetInnerHTML={{
-                    __html: tournamentDetail.details,
-                  }}
-                />
-              ) : (
-                <p className="text-muted-foreground">Chưa có mô tả chi tiết</p>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+                    dangerouslySetInnerHTML={{
+                      __html: tournamentDetail.details,
+                    }}
+                  />
+                ) : (
+                  <p className="text-muted-foreground">
+                    Chưa có mô tả chi tiết
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

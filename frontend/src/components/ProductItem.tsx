@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
+import { toast } from "sonner";
+import { cartService } from "@/services/cartService";
+import { getCart } from "@/stores/actions/cartActions";
+import { useDispatch } from "react-redux";
 
 const ProductItem = ({ item }: { item: any }) => {
   const images = Array.isArray(item.images) ? item.images : [];
-
-  const [order, setOrder] = React.useState({
+  const dispatch = useDispatch();
+  const [order, setOrder] = useState({
     quantity: 1,
-    product: item,
-    image: images[0],
   });
 
   const decrease = () => {
@@ -30,9 +32,21 @@ const ProductItem = ({ item }: { item: any }) => {
     }
   };
 
-  const handleAddToCart = () => {
-    console.log("Add to cart:", order);
-    // dispatch(addToCart(order))
+  const [loading, setLoading] = React.useState(false);
+
+  const handleAddToCart = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const data = { productId: item.id, quantity: Number(order.quantity) };
+      await cartService.addToCart(data);
+      dispatch(getCart() as any);
+      toast.success("Thêm vào giỏ hàng thành công");
+    } catch (error) {
+      toast.error("Lỗi khi thêm vào giỏ hàng");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,8 +61,10 @@ const ProductItem = ({ item }: { item: any }) => {
           <h1 className="font-semibold text-lg mt-2">{item.name}</h1>
         </div>
 
-        <p className="mt-2 text-gray-700">Giá: {item.price}₫</p>
-        <p className="text-gray-500 text-sm">Tồn kho: {item.stock}</p>
+        <div className="flex items-center justify-between">
+          <p className="text-gray-700">Giá: {item.price}₫</p>
+          <p className="text-gray-500 text-sm">Tồn kho: {item.stock}</p>
+        </div>
       </Link>
       <div className="flex gap-4 justify-center items-center mt-2">
         <button

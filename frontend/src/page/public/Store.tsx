@@ -1,18 +1,11 @@
-import { ProductItem } from "@/components";
-import {
-  getProducts,
-  getProductsByCategory,
-} from "@/stores/actions/productActions";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Filter, ChevronDown } from "lucide-react";
 
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuLink,
-} from "@/components/ui/navigation-menu";
+import { ProductItem } from "@/components";
+import { getProducts } from "@/stores/actions/productActions";
+
 import {
   Pagination,
   PaginationContent,
@@ -26,22 +19,35 @@ const Store = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [page, setPage] = useState(1);
-  const { products, productsByCategory } = useSelector(
-    (state: any) => state.products
+  const [openFilter, setOpenFilter] = useState(
+    window.innerWidth >= 768 // mobile mặc định đóng
   );
+
+  const { products } = useSelector((state: any) => state.products);
 
   const params = new URLSearchParams(location.search);
   const category = params.get("category") || "";
-  console.log(category);
 
   useEffect(() => {
     dispatch(getProducts(page, category) as any);
-  }, [category, dispatch, page]);
-  const handleCategoryChange = (category: string) => {
-    navigate(`/products?category=${category}`);
+  }, [dispatch, page, category]);
+
+  const handleCategoryChange = (value?: string) => {
+    setPage(1);
+    if (value) {
+      navigate(`/products?category=${value}`);
+    } else {
+      navigate("/products");
+    }
+    setOpenFilter(false);
   };
-  console.log(products.data);
+
+  const handlePageChange = (p: number) => {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const categories = [
     { label: "Nước", value: "nước" },
@@ -50,85 +56,134 @@ const Store = () => {
   ];
 
   return (
-    <div className="px-16 py-7 max-w-7xl mx-auto">
-      <div>
-        <NavigationMenu className="mb-5">
-          <NavigationMenuList className="flex gap-2 bg-white border rounded-xl p-1 shadow-sm">
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                className="px-4 py-2 rounded-lg font-medium cursor-pointer transition-all"
-                onClick={() => navigate("/products")}
-              >
-                All
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            {categories.map((cat) => {
-              const active = category === cat.value;
-              return (
-                <NavigationMenuItem key={cat.value}>
-                  <NavigationMenuLink
-                    onClick={() => handleCategoryChange(cat.value)}
-                    className={`
-                  px-4 py-2 rounded-lg font-medium cursor-pointer transition-all
+    <div className="max-w-7xl mx-auto px-6 md:px-16 py-8">
+      {/*   FILTER TOGGLE  */}
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Sản phẩm</h1>
+
+        <button
+          onClick={() => setOpenFilter(!openFilter)}
+          className={`
+            flex items-center gap-2 px-4 py-2 rounded-full
+            text-sm font-medium border transition-all
+            ${
+              openFilter
+                ? "bg-black text-white shadow"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }
+            focus:outline-none focus:ring-0
+          `}
+        >
+          <Filter className="h-4 w-4" />
+          Bộ lọc
+          <ChevronDown
+            className={`h-4 w-4 transition-transform ${
+              openFilter ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* FILTER*/}
+      <div
+        className={`
+          origin-top transition-all duration-300 ease-out overflow-hidden
+          ${
+            openFilter
+              ? "max-h-[200px] opacity-100 scale-y-100"
+              : "max-h-0 opacity-0 scale-y-95 pointer-events-none"
+          }
+        `}
+      >
+        <div className="mb-8 flex flex-wrap gap-3 rounded-2xl border bg-white/70 backdrop-blur-md p-4 shadow-sm">
+          {/* ALL */}
+          <button
+            onClick={() => handleCategoryChange()}
+            className={`
+              px-6 py-2.5 rounded-full text-sm font-semibold transition-all
+              ${
+                !category
+                  ? "bg-black text-white shadow-md scale-105"
+                  : "text-gray-600 hover:bg-black/5 hover:scale-105"
+              }
+              focus:outline-none focus:ring-0
+            `}
+          >
+            Tất cả
+          </button>
+
+          {categories.map((cat) => {
+            const active = category === cat.value;
+            return (
+              <button
+                key={cat.value}
+                onClick={() => handleCategoryChange(cat.value)}
+                className={`
+                  px-6 py-2.5 rounded-full text-sm font-semibold transition-all
                   ${
                     active
-                      ? "bg-black text-white shadow"
-                      : "text-gray-600 hover:text-black hover:shadow-600"
+                      ? "bg-black text-white shadow-md scale-105"
+                      : "text-gray-600 hover:bg-black/5 hover:scale-105"
                   }
+                  focus:outline-none focus:ring-0
                 `}
-                  >
-                    {cat.label}
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              );
-            })}
-          </NavigationMenuList>
-        </NavigationMenu>
-
-        <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
-          {Array.isArray(products?.data) &&
-            products.data.map((product: any) => (
-              <ProductItem key={product.id} item={product} />
-            ))}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
         </div>
       </div>
-      <div className="mt-[40px]">
-        {products.pagination && (
-          <Pagination className="mt-6">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => page > 1 && setPage(page - 1)}
-                />
-              </PaginationItem>
 
-              {Array.from({ length: products.pagination.totalPages }).map(
-                (_, index) => {
-                  const pageNumber = index + 1;
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        isActive={page === pageNumber}
-                        onClick={() => setPage(pageNumber)}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
+      {/* ===== PRODUCT GRID ===== */}
+      {Array.isArray(products?.data) && products.data.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {products.data.map((product: any) => (
+            <ProductItem key={product.id} item={product} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-20 text-center text-gray-500">
+          <p className="text-lg font-medium">Không có sản phẩm</p>
+          <p className="text-sm mt-2">Hãy thử chọn danh mục khác</p>
+        </div>
+      )}
+
+      {/* ===== PAGINATION ===== */}
+      {products?.pagination && products.pagination.totalPages > 1 && (
+        <Pagination className="mt-10">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => page > 1 && handlePageChange(page - 1)}
+              />
+            </PaginationItem>
+
+            {Array.from(
+              { length: products.pagination.totalPages },
+              (_, i) => i + 1
+            ).map((p) => (
+              <PaginationItem key={p}>
+                <PaginationLink
+                  isActive={page === p}
+                  onClick={() => handlePageChange(p)}
+                >
+                  {p}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  page < products.pagination.totalPages &&
+                  handlePageChange(page + 1)
                 }
-              )}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() =>
-                    page < products.pagination.totalPages && setPage(page + 1)
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-      </div>
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 };

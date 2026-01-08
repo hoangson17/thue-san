@@ -23,43 +23,137 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { Ban, MoreHorizontal } from "lucide-react";
+
 const AdminUsers = () => {
-  const { getUsers } = useSelector((state: any) => state.users);
   const dispatch = useDispatch();
+  const { getUsers, loading } = useSelector((state: any) => state.users);
+  const { user: currentUser } = useSelector((state: any) => state.auth);
 
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [role, setRole] = useState<string | undefined>(undefined);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   useEffect(() => {
-    dispatch(getAllUsers(page) as any);
-  }, [dispatch, page]);
-
+    dispatch(
+      getAllUsers({
+        page,
+        search,
+        role,
+        order: "DESC",
+      }) as any
+    );
+  }, [dispatch, page, search, role]);
   console.log(getUsers);
-
-  const users = getUsers?.data || [];
+  
+  const users = getUsers || [];
   const pagination = getUsers?.pagination;
 
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+
+    // TODO: gọi soft delete API
+    // await dispatch(softDeleteUser(selectedUser.id) as any);
+
+    dispatch(
+      getAllUsers({
+        page,
+        search,
+        role,
+        order: "DESC",
+      }) as any
+    );
+
+    setSelectedUser(null);
+  };
+
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-xl font-semibold">Danh sách người dùng</h1>
+    <div className="space-y-6">
+      <h1 className="text-xl font-semibold">Danh sách người dùng</h1>
+
+      {/* SEARCH + FILTER */}
+      <div className="flex gap-4">
+        <Input
+          placeholder="Tìm theo tên hoặc email..."
+          value={search}
+          onChange={(e) => {
+            setPage(1);
+            setSearch(e.target.value);
+          }}
+          className="w-[260px]"
+        />
+
+        <Select
+          value={role}
+          onValueChange={(v) => {
+            setPage(1);
+            setRole(v === "all" ? undefined : v);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Tất cả role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="user">User</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* TABLE */}
       <div className="rounded-xl border bg-background shadow-sm">
         <div className="h-[450px] overflow-auto">
-          <Table className="table-fixed w-full">
+          <Table className="w-full table-fixed">
             <TableHeader className="sticky top-0 z-10 bg-background">
               <TableRow className="bg-muted/50">
                 <TableHead className="w-[60px] text-center">ID</TableHead>
                 <TableHead className="w-[80px] text-center">Avatar</TableHead>
                 <TableHead className="w-[220px]">Tên</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead className="w-[220px]">Email</TableHead>
                 <TableHead className="w-[120px] text-center">Role</TableHead>
                 <TableHead className="w-[140px]">Ngày tạo</TableHead>
+                <TableHead className="w-[100px] text-center">
+                  Thao tác
+                </TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {users.length === 0 && (
+              {!loading && users.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={7}
                     className="py-10 text-center text-muted-foreground"
                   >
                     Không có dữ liệu
@@ -67,52 +161,115 @@ const AdminUsers = () => {
                 </TableRow>
               )}
 
-              {users.map((user: any) => (
-                <TableRow
-                  key={user.id}
-                  className="transition hover:bg-muted/40"
-                >
-                  <TableCell className="w-[60px] text-center">
-                    {user.id}
-                  </TableCell>
+              {users.map((user: any) => {
+                const isSelf = currentUser?.id === user.id;
 
-                  <TableCell className="w-[80px] text-center">
-                    <Avatar className="mx-auto h-9 w-9">
-                      <AvatarImage src={user.avatar || ""} />
-                      <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </TableCell>
+                return (
+                  <TableRow
+                    key={user.id}
+                    className="transition hover:bg-muted/40"
+                  >
+                    <TableCell className="text-center">
+                      {user.id}
+                    </TableCell>
 
-                  <TableCell className="w-[220px] truncate font-medium">
-                    {user.name}
-                  </TableCell>
+                    <TableCell className="text-center">
+                      <Avatar className="mx-auto h-9 w-9">
+                        <AvatarImage src={`${import.meta.env.VITE_SERVER_API}${user.avatar}` || ""} />
+                        <AvatarFallback>
+                          {user.name?.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TableCell>
 
-                  <TableCell className="truncate text-muted-foreground">
-                    {user.email}
-                  </TableCell>
+                    <TableCell className="truncate font-medium">
+                      {user.name}
+                    </TableCell>
 
-                  <TableCell className="w-[120px] text-center">
-                    <Badge
-                      variant={
-                        user.role === "admin" ? "destructive" : "secondary"
-                      }
-                    >
-                      {user.role}
-                    </Badge>
-                  </TableCell>
+                    <TableCell className="truncate text-muted-foreground">
+                      {user.email}
+                    </TableCell>
 
-                  <TableCell className="w-[140px] text-sm text-muted-foreground">
-                    {new Date(user.createdAt).toLocaleDateString("vi-VN")}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell className="text-center">
+                      <Badge
+                        variant={
+                          user.role === "admin"
+                            ? "destructive"
+                            : "secondary"
+                        }
+                      >
+                        {user.role}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(user.createdAt).toLocaleDateString("vi-VN")}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Xem</DropdownMenuItem>
+                          <DropdownMenuItem>Sửa</DropdownMenuItem>
+
+                          {!isSelf && user.role !== "admin" && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onSelect={(e) => {
+                                    e.preventDefault();
+                                    setSelectedUser(user);
+                                  }}
+                                >
+                                  <Ban color="red" />
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Xác nhận khóa
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Bạn có chắc chắn muốn Khóa{" "}
+                                    <b>{user.name}</b>?  
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>
+                                    Hủy
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-destructive"
+                                    onClick={handleDeleteUser}
+                                  >
+                                    Khóa
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
       </div>
 
       {/* PAGINATION */}
-      {pagination && (
+      {pagination?.totalPages > 1 && (
         <Pagination className="mt-6">
           <PaginationContent>
             <PaginationItem>
@@ -121,15 +278,15 @@ const AdminUsers = () => {
               />
             </PaginationItem>
 
-            {Array.from({ length: pagination.totalPages }).map((_, index) => {
-              const pageNumber = index + 1;
+            {Array.from({ length: pagination.totalPages }).map((_, i) => {
+              const p = i + 1;
               return (
-                <PaginationItem key={pageNumber}>
+                <PaginationItem key={p}>
                   <PaginationLink
-                    isActive={page === pageNumber}
-                    onClick={() => setPage(pageNumber)}
+                    isActive={page === p}
+                    onClick={() => setPage(p)}
                   >
-                    {pageNumber}
+                    {p}
                   </PaginationLink>
                 </PaginationItem>
               );

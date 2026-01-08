@@ -72,24 +72,53 @@ export const setProfile = (data: any) => ({
   payload: data,
 });
 
-export const getAllUsers = (page: number) => async (dispatch: any) => {
-  dispatch({ type: actionTypes.GET_ALL_USERS_REQUEST });
-  const limit = import.meta.env.VITE_PAGE_LIMIT;
+export const getOneUser = () => async (dispatch: any) => {
+  dispatch({ type: actionTypes.GET_ONE_USER_REQUEST });
   try {
-    const response = await authService.getAllUsers(page);
+    const response = await authService.findOneUser();
+    console.log(response);
     dispatch({
-      type: actionTypes.GET_ALL_USERS_SUCCESS,
-      payload: {
-        data: response.data[0],
-        pagination: {
-          total: response.data[1],
-          page,
-          limit,
-          totalPages: Math.ceil(response.data[1] / limit),
-        },
-      },
+      type: actionTypes.GET_ONE_USER_SUCCESS,
+      payload: response,
     });
   } catch (err: any) {
-    dispatch({ type: actionTypes.GET_ALL_USERS_FAILURE, payload: err });
+    dispatch({
+      type: actionTypes.GET_ONE_USER_FAILURE,
+      payload: err,
+    });
   }
 };
+
+export const getAllUsers =
+  (params?: {
+    page?: number;
+    search?: string;
+    role?: string;
+    order?: "ASC" | "DESC";
+  }) =>
+  async (dispatch: any) => {
+    dispatch({ type: actionTypes.GET_ALL_USERS_REQUEST });
+    const limit = Number(import.meta.env.VITE_PAGE_LIMIT) || 8;
+    try {
+      const response = await authService.findAllUsers({
+        page: params?.page,
+        limit,
+        search: params?.search,
+        role: params?.role,
+        order: params?.order ?? "DESC",
+      });
+
+      dispatch({
+        type: actionTypes.GET_ALL_USERS_SUCCESS,
+        payload: {
+          data: response.data,
+          pagination: response.pagination,
+        },
+      });
+    } catch (err: any) {
+      dispatch({
+        type: actionTypes.GET_ALL_USERS_FAILURE,
+        payload: err?.response?.data || err,
+      });
+    }
+  };

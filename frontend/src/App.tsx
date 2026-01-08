@@ -12,6 +12,8 @@ import {
   TournamentDetail,
   Profile,
   Cart,
+  OrderCourt,
+  RegisterTounament,
 } from "./page/public";
 import Google from "./page/public/Google";
 import { Toaster } from "sonner";
@@ -21,6 +23,11 @@ import Admin from "./page/private/Admin";
 import AdminUsers from "./page/private/AdminUsers";
 import AdminCourts from "./page/private/AdminCourts";
 import AdminTournaments from "./page/private/AdminTournaments";
+import Dashboard from "./page/private/Dashboard";
+import Support from "./page/private/Support";
+import AdminProducts from "./page/private/AdminProducts";
+import AdminCategories from "./page/private/AdminCategories";
+import AdminPrice from "./page/private/AdminPrice";
 
 function App() {
   return (
@@ -40,6 +47,11 @@ function App() {
             <Route element={<AuthMiddleware />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/order-courts" element={<OrderCourt />} />
+              <Route
+                path="/register-tournament"
+                element={<RegisterTounament />}
+              />
             </Route>
           </Route>
           <Route path="/login" element={<Auth type="login" />} />
@@ -48,9 +60,14 @@ function App() {
           <Route element={<AuthMiddleware />}>
             <Route element={<AdminMiddleware />}>
               <Route path="/admin" element={<Admin />}>
+                <Route index element={<Dashboard />} />
                 <Route path="users" element={<AdminUsers />} />
                 <Route path="courts" element={<AdminCourts />} />
+                <Route path="support" element={<Support />} />
                 <Route path="tournaments" element={<AdminTournaments />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="categories" element={<AdminCategories />} />
+                <Route path="prices" element={<AdminPrice />} />
               </Route>
             </Route>
           </Route>

@@ -17,19 +17,9 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 export class CourtController {
   constructor(private readonly courtService: CourtService) {}
 
-  
-  // @Get()
-  // findCourtPrice(@Query('price') price?: string) {
-  //   if (!price) {
-  //     return this.courtService.findAll();
-  //   }
-
-  //   return this.courtService.findCourtPrice(Number(price));
-  // }
-
   @Get()
-  findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
-    return this.courtService.findAll({ page, limit });
+  findAll(@Query('page') page?: number, @Query('limit') limit?: number,@Query('order') order?: string, @Query('search') search?: string) {
+    return this.courtService.findAll({ page, limit, order, search });
   }
 
 

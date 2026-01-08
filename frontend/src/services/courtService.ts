@@ -1,11 +1,13 @@
 import axiosInstance from "@/axiosConfig";
 
 export const courtService = {
-  getCourt: async (page?: number, limit?: number) => {
+  getCourt: async (page?: number, limit?: number, order?: string, search?: string) => {
     const response = await axiosInstance.get("/court", {
       params: {
         page,
         limit,
+        order,
+        search,
       },
     });
     return response;

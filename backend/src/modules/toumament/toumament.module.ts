@@ -8,15 +8,18 @@ import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ToumamentImage } from 'src/entities/toumamentImage.entity';
+import { ToumamentRegisterController } from './toumament-register.controller';
+import { User } from 'src/entities/user.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  controllers: [ToumamentController],
+  controllers: [ToumamentController, ToumamentRegisterController],
   providers: [ToumamentService],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
     }),
-    TypeOrmModule.forFeature([Toumament,ToumamentImage]),
+    TypeOrmModule.forFeature([Toumament,ToumamentImage,User]),
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/toumament',
@@ -38,7 +41,8 @@ import { ToumamentImage } from 'src/entities/toumamentImage.entity';
           cb(null, false);
         }
       }
-    })
+    }),
+    AuthModule
   ],
 })
 export class ToumamentModule {}

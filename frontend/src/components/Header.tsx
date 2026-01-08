@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,13 +17,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, ShoppingCart } from "lucide-react";
 import { Input } from "./ui/input";
 import img3 from "@/assets/image_3.png";
+import formatImg from "@/utils/fomatImg";
 
 const Header = () => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logout() as any);
   };
 
   const menu = [
@@ -46,8 +47,10 @@ const Header = () => {
     {
       name: "Liên hệ",
       link: "/contact",
-    }
-  ]
+    },
+  ];
+
+  useEffect(() => {}, []);
 
   return (
     <header className="shadow border-gray-200 sticky top-0 left-0 right-0 bg-white z-50 w-full">
@@ -75,7 +78,6 @@ const Header = () => {
                 </li>
               ))}
             </ul>
-
           </nav>
 
           <div className="hidden md:flex items-center rounded-full border border-gray-20 w-70">
@@ -117,7 +119,7 @@ const Header = () => {
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger className="outline-none">
                   <Avatar className="cursor-pointer w-10 h-10">
-                    <AvatarImage src={user?.avatar || ""} />
+                    <AvatarImage src={formatImg(user?.avatar)} />
                     <AvatarFallback>
                       {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
                     </AvatarFallback>
@@ -131,15 +133,15 @@ const Header = () => {
                     <Link to="/profile">Profile</Link>
                   </DropdownMenuItem>
                   {user?.role === "admin" && (
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin">Admin</Link>
-                      </DropdownMenuItem>
-                    )}
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">Admin</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link to="/order-courts">Sân đã đặt</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/team">Giải đấu đã đăng kí</Link>
+                    <Link to="/register-tournament">Giải đấu đã đăng kí</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/save-tournament">Giải đấu đã lưu</Link>

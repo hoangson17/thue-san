@@ -5,13 +5,14 @@ import { CourtImage } from 'src/entities/courtImage.entity';
 import { CourtPricings } from 'src/entities/courtPricings.entity';
 import { CourtType } from 'src/entities/courtType.entity';
 import { Sport } from 'src/entities/sport.entity';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class CourtService {
   constructor(
     @InjectRepository(Court) private courtRepository: Repository<Court>,
-    @InjectRepository(CourtPricings) private courtPricingsRepository: Repository<CourtPricings>,
+    @InjectRepository(CourtPricings)
+    private courtPricingsRepository: Repository<CourtPricings>,
     @InjectRepository(CourtType)
     private courtTypeRepository: Repository<CourtType>,
     @InjectRepository(CourtImage)
@@ -19,14 +20,28 @@ export class CourtService {
     @InjectRepository(Sport) private sportRepository: Repository<Sport>,
   ) {}
 
-  async findAll({ page, limit }: { page?: number; limit?: number }) {
-    if (!page || !limit) {
-      return await this.courtRepository.findAndCount();
+  async findAll({
+    page = 1,
+    limit = 10,
+    order = 'DESC',
+    search,
+  }: {
+    page?: number;
+    limit?: number;
+    order?: 'ASC' | 'DESC' | string;
+    search?: string;
+  }) {
+    const where: any = {};
+
+    if (search) {
+      where.name = Like(`%${search}%`);
     }
-    return await this.courtRepository.findAndCount({
+
+    return this.courtRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      order: { createdAt: 'DESC' },
+      where,
+      order: { createdAt: order as any },
       relations: {
         images: true,
         court_type: {
@@ -48,13 +63,16 @@ export class CourtService {
   }
 
   async findOne(id: number) {
-    return await this.courtRepository.findOne({ where: { id }, relations:{
-      images: true,
-      court_type: {
-        sport_id: true,
+    return await this.courtRepository.findOne({
+      where: { id },
+      relations: {
+        images: true,
+        court_type: {
+          sport_id: true,
+        },
+        court_pricings: true,
       },
-      court_pricings: true,
-    } });
+    });
   }
 
   async create(data: any, files: Express.Multer.File[]) {
@@ -124,9 +142,9 @@ export class CourtService {
     });
   }
 
-  async findCourtPrice(price:number) {
+  async findCourtPrice(price: number) {
     return await this.courtPricingsRepository.find({
-      where:{price_per_hour: price},
+      where: { price_per_hour: price },
       relations: {
         court: {
           images: true,
@@ -138,7 +156,4 @@ export class CourtService {
   createPrice(data: any) {
     return this.courtPricingsRepository.save(data);
   }
-
-
-
 }

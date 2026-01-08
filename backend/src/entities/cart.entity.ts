@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 import { CartItem } from "./CartItem.entity";
 
@@ -7,10 +7,10 @@ export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, user => user.carts, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, user => user.cart, {onDelete: 'CASCADE'})
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany(() => CartItem, item => item.cart, { cascade: true })
+  @OneToMany(() => CartItem, item => item.cart, {onDelete: 'CASCADE'})
   items: CartItem[];
 }
