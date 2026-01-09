@@ -8,7 +8,7 @@ export class Sport {
 
     @Column({
         type: 'varchar',
-        length: 100
+        length: 100 
     })
     name: string;
 

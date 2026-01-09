@@ -83,6 +83,65 @@ export class AuthService {
     return this.createToken(user);
   }
 
+  // -------------------------------------------------
+
+  facebookRedirect(): string {
+    const params = new URLSearchParams({
+      client_id: process.env.FACEBOOK_CLIENT_ID!,
+      redirect_uri: process.env.FACEBOOK_CALLBACK_URL!,
+      response_type: 'code',
+      scope: 'email,public_profile',
+    });
+    return `https://www.facebook.com/v18.0/dialog/oauth?${params.toString()}`;
+  }
+
+  async facebookCallback(code: string) {
+    const tokenResponse = await fetch(
+      `https://graph.facebook.com/v18.0/oauth/access_token?` +
+        new URLSearchParams({
+          client_id: process.env.FACEBOOK_CLIENT_ID!,
+          client_secret: process.env.FACEBOOK_SECRET_ID!,
+          redirect_uri: process.env.FACEBOOK_CALLBACK_URL!,
+          code,
+        }).toString(),
+    );
+
+    if (!tokenResponse.ok) {
+      const error = await tokenResponse.text();
+      throw new BadRequestException(`Facebook token error: ${error}`);
+    }
+
+    return await tokenResponse.json();
+  }
+
+  async facebookLogin(accessToken: string) {
+    const userResponse = await fetch(
+      `https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${accessToken}`,
+    );
+
+    if (!userResponse.ok) {
+      const error = await userResponse.text();
+      throw new BadRequestException(`Facebook user error: ${error}`);
+    }
+
+    const profile = await userResponse.json();
+    const email = profile.email ?? `${profile.id}@facebook.com`;
+
+    let user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      user = await this.userRepository.save({
+        name: profile.name,
+        email,
+        avatar: profile.picture?.data?.url,
+        provider: 'facebook',
+      });
+      const cart = this.cartRepository.create({ user } as any);
+      await this.cartRepository.save(cart);
+    }
+
+    return this.createToken(user);
+  }
+
   async profile(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },
@@ -254,36 +313,43 @@ export class AuthService {
   }
 
   async updateUser(user: any, data: any, file?: Express.Multer.File) {
-  const userExist = await this.userRepository.findOne({ where: { id: user.id } });
-  if (!userExist) return null;
+    const userExist = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+    if (!userExist) return null;
 
-  if (data.email && data.email !== userExist.email) {
-    const emailExist = await this.userRepository.findOne({ where: { email: data.email } });
-    if (emailExist) return null;
+    if (data.email && data.email !== userExist.email) {
+      const emailExist = await this.userRepository.findOne({
+        where: { email: data.email },
+      });
+      if (emailExist) return null;
+    }
+
+    if (data.phone && data.phone !== userExist.phone) {
+      const phoneExist = await this.userRepository.findOne({
+        where: { phone: data.phone },
+      });
+      if (phoneExist) return null;
+    }
+
+    const updateData = data;
+
+    if (file) {
+      updateData.avatar = `/uploads/avatar/${file.filename}`;
+    }
+
+    if (data.password) {
+      updateData.password = await Hash.make(data.password);
+    }
+
+    await this.userRepository.update(user.id, updateData);
+
+    const updatedUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+    if (!updatedUser) return null;
+
+    delete (updatedUser as any).password;
+    return updatedUser;
   }
-
-  if (data.phone && data.phone !== userExist.phone) {
-    const phoneExist = await this.userRepository.findOne({ where: { phone: data.phone } });
-    if (phoneExist) return null;
-  }
-
-  const updateData = data;
-
-  if (file) {
-    updateData.avatar = `/uploads/avatar/${file.filename}`;
-  }
-
-  if (data.password) {
-    updateData.password = await Hash.make(data.password);
-  }
-
-  await this.userRepository.update(user.id, updateData);
-
-  const updatedUser = await this.userRepository.findOne({ where: { id: user.id } });
-  if (!updatedUser) return null;
-
-  delete (updatedUser as any).password;
-  return updatedUser;
-}
-
 }

@@ -9,6 +9,11 @@ export const authService = {
       accessToken: accessTokenFromGoogle,
     }),
 
+  loginWithFacebook: (accessTokenFromFacebook: string) =>
+    axiosInstance.post("/auth/facebook/callback", {
+      accessToken: accessTokenFromFacebook,
+    }),
+
   register: (body: any) => axiosInstance.post("/auth/register", body),
 
   logout: () => {
@@ -68,7 +73,7 @@ export const authService = {
       },
     });
     console.log(res.data);
-    
+
     return res.data;
   },
 

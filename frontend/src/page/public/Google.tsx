@@ -11,7 +11,6 @@ const Google = () => {
 
   useEffect(() => {
     if (!accessTokenFromGoogle) return;
-
     const handleGoogleLogin = async () => {
       try {
         // Gọi action loginWithGoogle

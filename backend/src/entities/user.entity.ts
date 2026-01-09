@@ -19,7 +19,7 @@ export class User {
     @Column({ type: 'varchar', length: 100 })
     name: string;
 
-    @Column({ type: 'varchar', length: 100, unique: true })
+    @Column({ type: 'varchar', length: 100, unique: true, nullable: true })
     email: string;
 
     @Column({ type: 'varchar', length: 20, unique: true, nullable: true })
@@ -53,8 +53,11 @@ export class User {
     @ManyToMany(()=>Toumament, (toumament) => toumament.users)
     toumaments: Toumament[]; 
 
-    @Column({ type: 'varchar', nullable: true })
+    @Column({ type: 'text', nullable: true })
     avatar: string;
+
+    @Column({ type: 'varchar', length: 10 , nullable: true})
+    provider: string;
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

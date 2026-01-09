@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -47,6 +48,34 @@ export class AuthController {
   async googleCallbackPost(@Body() { accessToken }: { accessToken: string }) {
     return this.authService.googleLogin(accessToken);
   }
+
+  // --------------------------------------------
+
+  @Get('facebook')
+  redirectFacebook(@Res() res: Response) {
+    return res.redirect(this.authService.facebookRedirect());
+  }
+
+  @Get('facebook/callback')
+  async facebookCallback(@Query('code') code: string, @Res() res: Response) {
+    if (!code) throw new BadRequestException('Facebook login failed');
+
+    const tokenData = await this.authService.facebookCallback(code);
+
+    return res.redirect(
+      `${process.env.FACEBOOK_FRONTEND_URL}?accessToken=${tokenData.access_token}`,
+    );
+  }
+
+  @Post('facebook/callback')
+  async facebookCallbackPost(@Body() body: { accessToken: string }) {
+    if (!body.accessToken)
+      throw new BadRequestException('accessToken is required');
+
+    return this.authService.facebookLogin(body.accessToken);
+  }
+
+  // --------------------------------------------
 
   @Post('login')
   async login(@Body() body: any) {

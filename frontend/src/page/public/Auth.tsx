@@ -3,12 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { Lock, Mail, Phone, User } from "lucide-react";
+import { Icon, Lock, Mail, Phone, User } from "lucide-react";
 import { Footer, Header } from "@/components";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, register } from "@/stores/actions/authActions";
 import { toast } from "sonner";
+import { IconBrandFacebook } from "@tabler/icons-react";
 
 interface AuthProps {
   type: "login" | "register";
@@ -36,12 +37,12 @@ const Auth: React.FC<AuthProps> = ({ type }) => {
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setLoginForm(prev => ({ ...prev, [name]: value }));
+    setLoginForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setRegisterForm(prev => ({ ...prev, [name]: value }));
+    setRegisterForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -128,7 +129,9 @@ const Auth: React.FC<AuthProps> = ({ type }) => {
                     className="pl-12 py-6 rounded-xl"
                     required
                     value={isLogin ? loginForm.email : registerForm.email}
-                    onChange={isLogin ? handleLoginChange : handleRegisterChange}
+                    onChange={
+                      isLogin ? handleLoginChange : handleRegisterChange
+                    }
                   />
                 </div>
 
@@ -141,7 +144,9 @@ const Auth: React.FC<AuthProps> = ({ type }) => {
                     className="pl-12 py-6 rounded-xl"
                     required
                     value={isLogin ? loginForm.password : registerForm.password}
-                    onChange={isLogin ? handleLoginChange : handleRegisterChange}
+                    onChange={
+                      isLogin ? handleLoginChange : handleRegisterChange
+                    }
                   />
                 </div>
 
@@ -150,7 +155,11 @@ const Auth: React.FC<AuthProps> = ({ type }) => {
                   disabled={loading}
                   className="w-full py-6 text-base rounded-xl bg-blue-600 hover:bg-blue-700"
                 >
-                  {loading ? "Processing..." : isLogin ? "Sign In" : "Create Account"}
+                  {loading
+                    ? "Processing..."
+                    : isLogin
+                    ? "Sign In"
+                    : "Create Account"}
                 </Button>
 
                 <div className="flex items-center gap-3 py-2">
@@ -159,17 +168,29 @@ const Auth: React.FC<AuthProps> = ({ type }) => {
                   <div className="flex-1 h-px bg-gray-300"></div>
                 </div>
 
-                <a
-                  href={`${import.meta.env.VITE_SERVER_API}/auth/google/redirect`}
-                  className="w-full py-3 text-base rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-3"
-                >
-                  <img
-                    src="https://www.svgrepo.com/show/475656/google-color.svg"
-                    alt="Google"
-                    className="w-5 h-5"
-                  />
-                  Continue with Google
-                </a>
+                <div className="flex gap-3">
+                  <a
+                    href={`${
+                      import.meta.env.VITE_SERVER_API
+                    }/auth/google/redirect`}
+                    className="w-full py-3 text-base rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-3"
+                  >
+                    <img
+                      src="https://www.svgrepo.com/show/475656/google-color.svg"
+                      alt="Google"
+                      className="w-5 h-5"
+                    />
+                    Login Google
+                  </a>
+
+                  <a
+                    href={`${import.meta.env.VITE_SERVER_API}/auth/facebook`}
+                    className="w-full py-3 text-base rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-3"
+                  >
+                    <IconBrandFacebook className="w-5 h-5" />
+                    Login Facebook
+                  </a>
+                </div>
               </form>
 
               <p className="text-center text-sm text-gray-600 pt-2">
@@ -177,14 +198,16 @@ const Auth: React.FC<AuthProps> = ({ type }) => {
                   <>
                     Don’t have an account?
                     <Link to="/register" className="text-blue-600 font-medium">
-                      {" "}Sign up
+                      {" "}
+                      Sign up
                     </Link>
                   </>
                 ) : (
                   <>
                     Already have an account?
                     <Link to="/login" className="text-blue-600 font-medium">
-                      {" "}Sign in
+                      {" "}
+                      Sign in
                     </Link>
                   </>
                 )}

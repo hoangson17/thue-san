@@ -28,7 +28,7 @@ export class Toumament {
   @Column({ type: 'varchar', length: 50 })
   organizer: string;
 
-  @ManyToMany(()=>User, (users) => users.toumaments)
+  @ManyToMany(()=>User, (users) => users.toumaments, { cascade: true })
   @JoinTable({
     name: 'toumament_users',
     joinColumn: {

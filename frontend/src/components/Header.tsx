@@ -22,7 +22,8 @@ import formatImg from "@/utils/fomatImg";
 const Header = () => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
-
+  console.log(user);
+  
   const handleLogout = () => {
     dispatch(logout() as any);
   };

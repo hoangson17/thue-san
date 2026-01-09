@@ -57,6 +57,24 @@ export const loginWithGoogle =
     }
   };
 
+export const loginWithFacebook =
+  (accessTokenFromFacebook: string) => async (dispatch: any) => {
+    dispatch({ type: actionTypes.LOGIN_REQUEST });
+    try {
+      const res = await authService.loginWithFacebook(accessTokenFromFacebook);      
+      authService.saveTokens(res.data.accessToken, res.data.refreshToken);
+      dispatch({ type: actionTypes.LOGIN_SUCCESS, payload: res.data });
+      return res.data;
+    } catch (err: any) {
+      dispatch({
+        type: actionTypes.LOGIN_FAILURE,
+        payload: err.response?.data?.message || "Facebook login failed",
+      });
+      throw err;
+    }
+  };
+
+
 export const logout = () => (dispatch: any) => {
   authService.logout();
   dispatch({ type: actionTypes.LOGOUT });

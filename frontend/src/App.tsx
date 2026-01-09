@@ -14,6 +14,7 @@ import {
   Cart,
   OrderCourt,
   RegisterTounament,
+  Facebook,
 } from "./page/public";
 import Google from "./page/public/Google";
 import { Toaster } from "sonner";
@@ -57,6 +58,7 @@ function App() {
           <Route path="/login" element={<Auth type="login" />} />
           <Route path="/register" element={<Auth type="register" />} />
           <Route path="/auth/google/callback" element={<Google />} />
+          <Route path="/auth/facebook/callback" element={<Facebook />} />
           <Route element={<AuthMiddleware />}>
             <Route element={<AdminMiddleware />}>
               <Route path="/admin" element={<Admin />}>
