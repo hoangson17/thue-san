@@ -53,6 +53,10 @@ import {
 } from "@/components/ui/select";
 
 import { Ban, MoreHorizontal } from "lucide-react";
+import formatImg from "@/utils/fomatImg";
+import { authService } from "@/services/authService";
+import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const AdminUsers = () => {
   const dispatch = useDispatch();
@@ -75,15 +79,19 @@ const AdminUsers = () => {
     );
   }, [dispatch, page, search, role]);
   console.log(getUsers);
-  
+
   const users = getUsers || [];
   const pagination = getUsers?.pagination;
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
 
-    // TODO: gọi soft delete API
-    // await dispatch(softDeleteUser(selectedUser.id) as any);
+    try {
+      await authService.lockUser(selectedUser.id);
+      toast.success("Khóa người dùng thành công");
+    } catch (error) {
+      toast.error("Khóa người dùng thất bại");
+    }
 
     dispatch(
       getAllUsers({
@@ -100,35 +108,38 @@ const AdminUsers = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold">Danh sách người dùng</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex gap-4">
+          <Input
+            placeholder="Tìm theo tên hoặc email..."
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
+            className="w-[260px]"
+          />
 
-      {/* SEARCH + FILTER */}
-      <div className="flex gap-4">
-        <Input
-          placeholder="Tìm theo tên hoặc email..."
-          value={search}
-          onChange={(e) => {
-            setPage(1);
-            setSearch(e.target.value);
-          }}
-          className="w-[260px]"
-        />
-
-        <Select
-          value={role}
-          onValueChange={(v) => {
-            setPage(1);
-            setRole(v === "all" ? undefined : v);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Tất cả role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="user">User</SelectItem>
-          </SelectContent>
-        </Select>
+          <Select
+            value={role}
+            onValueChange={(v) => {
+              setPage(1);
+              setRole(v === "all" ? undefined : v);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Tất cả role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="user">User</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Link to={'/admin/users-locked'} ><Button>User đã khóa</Button></Link>
+        </div>
       </div>
 
       {/* TABLE */}
@@ -141,7 +152,7 @@ const AdminUsers = () => {
                 <TableHead className="w-[80px] text-center">Avatar</TableHead>
                 <TableHead className="w-[220px]">Tên</TableHead>
                 <TableHead className="w-[220px]">Email</TableHead>
-                <TableHead className="w-[120px] text-center">Role</TableHead>
+                <TableHead className="w-[120px]">Role</TableHead>
                 <TableHead className="w-[140px]">Ngày tạo</TableHead>
                 <TableHead className="w-[100px] text-center">
                   Thao tác
@@ -169,16 +180,12 @@ const AdminUsers = () => {
                     key={user.id}
                     className="transition hover:bg-muted/40"
                   >
-                    <TableCell className="text-center">
-                      {user.id}
-                    </TableCell>
+                    <TableCell className="text-center">{user.id}</TableCell>
 
                     <TableCell className="text-center">
                       <Avatar className="mx-auto h-9 w-9">
-                        <AvatarImage src={`${import.meta.env.VITE_SERVER_API}${user.avatar}` || ""} />
-                        <AvatarFallback>
-                          {user.name?.charAt(0)}
-                        </AvatarFallback>
+                        <AvatarImage src={formatImg(user?.avatar) || ""} />
+                        <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
                       </Avatar>
                     </TableCell>
 
@@ -191,15 +198,36 @@ const AdminUsers = () => {
                     </TableCell>
 
                     <TableCell className="text-center">
-                      <Badge
-                        variant={
-                          user.role === "admin"
-                            ? "destructive"
-                            : "secondary"
-                        }
+                      <Select
+                        value={user.role}
+                        disabled={isSelf}
+                        onValueChange={async (v) => {
+                          if (v === user.role) return;
+                          try {
+                            (await authService.updateRole(user.id, v)) as any;
+                            toast.success("Thêm sửa quyền thành công");
+                          } catch (error) {
+                            toast.error("Không thể sửa quyền");
+                          }
+                          dispatch(
+                            getAllUsers({
+                              page,
+                              search,
+                              role,
+                              order: "DESC",
+                            }) as any
+                          );
+                        }}
                       >
-                        {user.role}
-                      </Badge>
+                        <SelectTrigger className="w-[90px]">
+                          <SelectValue placeholder="Chọn role" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="user">User</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
 
                     <TableCell className="text-sm text-muted-foreground">
@@ -209,15 +237,18 @@ const AdminUsers = () => {
                     <TableCell className="text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
+                          {!isSelf ? (
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" disabled size="icon">
+                              <MoreHorizontal className="h-4 w-4 cursor-not-allowed" />
+                            </Button>
+                          )}
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Xem</DropdownMenuItem>
-                          <DropdownMenuItem>Sửa</DropdownMenuItem>
-
                           {!isSelf && user.role !== "admin" && (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
@@ -228,7 +259,7 @@ const AdminUsers = () => {
                                     setSelectedUser(user);
                                   }}
                                 >
-                                  <Ban color="red" />
+                                  <Ban color="red" /> Khóa tài khoản
                                 </DropdownMenuItem>
                               </AlertDialogTrigger>
 
@@ -239,14 +270,12 @@ const AdminUsers = () => {
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
                                     Bạn có chắc chắn muốn Khóa{" "}
-                                    <b>{user.name}</b>?  
+                                    <b>{user.name}</b>?
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
 
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>
-                                    Hủy
-                                  </AlertDialogCancel>
+                                  <AlertDialogCancel>Hủy</AlertDialogCancel>
                                   <AlertDialogAction
                                     className="bg-destructive"
                                     onClick={handleDeleteUser}

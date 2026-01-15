@@ -132,3 +132,86 @@
 @keyframes ct3 {
   100% {background-position: right -30px top 0}
 }
+
+
+/* Editor container */
+.ProseMirror {
+  @apply min-h-[200px] w-full rounded-md border border-input bg-background p-3
+         text-sm leading-6 outline-none;
+}
+
+/* Placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: "Nhập nội dung...";
+  @apply text-muted-foreground float-left h-0 pointer-events-none;
+}
+
+/* Headings */
+.ProseMirror h1 {
+  @apply text-3xl font-bold mt-6;
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-semibold mt-5;
+}
+
+.ProseMirror h3 {
+  @apply text-xl font-semibold mt-4;
+}
+
+.ProseMirror h4 {
+  @apply text-lg font-medium mt-3;
+}
+
+.ProseMirror h5 {
+  @apply text-base font-medium mt-2;
+}
+
+/* Lists */
+.ProseMirror ul {
+  @apply list-disc pl-6;
+}
+.ProseMirror ol {
+  @apply list-decimal pl-6;
+}
+
+/* Blockquote */
+.ProseMirror blockquote {
+  @apply border-l-4 border-muted pl-4 italic text-muted-foreground;
+}
+
+/* Code */
+.ProseMirror code {
+  @apply rounded bg-muted px-1 py-0.5 text-xs;
+}
+.ProseMirror pre {
+  @apply rounded-md bg-muted p-3 text-xs overflow-x-auto;
+}
+
+/* ===== TIPTAP TABLE ===== */
+.ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #e5e7eb; /* gray-300 */
+  padding: 8px;
+  vertical-align: top;
+}
+
+.ProseMirror th {
+  background-color: #f9fafb; /* gray-50 */
+  font-weight: 600;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE, Edge */
+  scrollbar-width: none;  /* Firefox */
+}

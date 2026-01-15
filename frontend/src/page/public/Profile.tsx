@@ -23,7 +23,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];    
+    const file = e.target.files?.[0];
     if (!file) return;
     setFile(file);
     setPreview(URL.createObjectURL(file));
@@ -47,12 +47,10 @@ const Profile = () => {
 
       const res = await authService.updateProfile(formData);
       console.log(res);
-      
+
       toast.success("Cập nhật thông tin thành công");
 
       dispatch(setProfile(res.data) as any);
-
-
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Cập nhật thất bại");
     } finally {
@@ -74,11 +72,9 @@ const Profile = () => {
                 <div className="relative group">
                   <Avatar className="w-32 h-32">
                     <AvatarImage
-                      src={preview || formatImg(user?.avatar)}
+                      src={preview || (user?.avatar ? formatImg(user.avatar) : "")}
                     />
-                    <AvatarFallback>
-                      {user?.name?.charAt(0)}
-                    </AvatarFallback>
+                    <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
 
                   <label className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition">

@@ -27,6 +27,7 @@ export class PricesService {
     }
     const options: any = {
       where,
+      relations: ['court'],
       order: { createdAt: order },
     };
     if (page && limit) {
@@ -42,17 +43,40 @@ export class PricesService {
   }
 
   async create(data: any) {
-    return this.courtPricingsRepository.save(data);
+    const { court, ...pricingData } = data;
+
+    const pricing = this.courtPricingsRepository.create(pricingData);
+
+    if (court?.length) {
+      pricing['court']= court.map((id: number) => ({ id }) as any);
+    }
+
+    return this.courtPricingsRepository.save(pricing);
   }
 
   async update(id: number, data: any) {
-    return this.courtPricingsRepository.update(id, data);
+    const { court, ...pricingData } = data;
+
+    const pricing = await this.courtPricingsRepository.findOne({
+      where: { id },
+      relations: ['court'],
+    });
+
+    if (!pricing) throw new Error('Not found');
+
+    Object.assign(pricing, pricingData);
+
+    if (court) {
+      pricing.court = court.map((id: number) => ({ id }) as any);
+    }
+
+    return this.courtPricingsRepository.save(pricing);
   }
 
   async delete(id: number) {
     return this.courtPricingsRepository.delete(id);
   }
-  
+
   async softDelete(id: number) {
     return this.courtPricingsRepository.softDelete(id);
   }
@@ -60,5 +84,4 @@ export class PricesService {
   async restore(id: number) {
     return this.courtPricingsRepository.restore(id);
   }
-
 }

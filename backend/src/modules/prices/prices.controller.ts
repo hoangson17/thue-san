@@ -46,7 +46,7 @@ export class PricesController {
 
   @Delete(':id')
   delete(@Param('id') id: string) {
-    return this.pricesService.softDelete(+id);
+    return this.pricesService.delete(+id);
   }
 
   @Delete(':id/softdelete')

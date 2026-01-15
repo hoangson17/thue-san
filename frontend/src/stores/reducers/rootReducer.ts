@@ -12,6 +12,8 @@ import cartReducer from "./cartReducer";
 import supportReducer from "./supportReducer";
 import categoriesReducer from "./categoriesReducer";
 import priceReducer from "./priceReducer";
+import sportReducer from "./sportReducer";
+import courtTypeReducer from "./courtTypeReducer";
 
 const authPersistConfig = {
   key: "auth",
@@ -29,7 +31,9 @@ const appReducer = combineReducers({
   cart: cartReducer,
   supports: supportReducer,
   categories: categoriesReducer,
-  prices: priceReducer
+  prices: priceReducer,
+  sports: sportReducer,
+  courtTypes: courtTypeReducer
 });
 
 const rootReducer = (state: any, action: any) => {

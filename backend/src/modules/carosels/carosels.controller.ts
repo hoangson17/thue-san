@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CaroselsService } from './carosels.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -24,18 +34,12 @@ export class CaroselsController {
 
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file'))
-  update(@Param('id') id: number, @Body() data: any,@UploadedFile() file: Express.Multer.File) {
-    return this.caroselsService.update(id, data,file);
-  }
-
-  @Patch(':id')
-  restore(@Param('id') id: number) {
-    return this.caroselsService.restore(id);
-  }
-
-  @Delete(':id')
-  softDelete(@Param('id') id: number) {
-    return this.caroselsService.softDelete(id);
+  update(
+    @Param('id') id: number,
+    @Body() data: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.caroselsService.update(id, data, file);
   }
 
   @Delete(':id')
@@ -43,5 +47,13 @@ export class CaroselsController {
     return this.caroselsService.delete(id);
   }
 
+  @Patch(':id/restore')
+  restore(@Param('id') id: number) {
+    return this.caroselsService.restore(id);
+  }
 
+  @Delete(':id/soft-delete')
+  softDelete(@Param('id') id: number) {
+    return this.caroselsService.softDelete(id);
+  }
 }

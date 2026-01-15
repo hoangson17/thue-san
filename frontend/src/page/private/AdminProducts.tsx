@@ -46,11 +46,12 @@ import {
 import { MoreHorizontal } from "lucide-react";
 
 import { getProducts } from "@/stores/actions/productActions";
+import { getAllCategories } from "@/stores/actions/categoriesActions";
 
 const AdminProducts = () => {
   const dispatch = useDispatch();
   const { products, loading } = useSelector((state: any) => state.products);
-
+  const { categories } = useSelector((state: any) => state.categories);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("");
@@ -66,9 +67,11 @@ const AdminProducts = () => {
     const delayDebounce = setTimeout(() => {
       dispatch(getProducts(page, category, search) as any);
     }, 500);
-
+    dispatch(getAllCategories() as any);
     return () => clearTimeout(delayDebounce);
   }, [dispatch, page, category, search]);
+
+  console.log(categories);
 
   const handleDeleteProduct = async (product: any) => {
     // await dispatch(deleteProduct(product.id) as any);
@@ -109,9 +112,11 @@ const AdminProducts = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="snack">Snack</SelectItem>
-              <SelectItem value="nước">Nước</SelectItem>
-              <SelectItem value="vợt">Vợt</SelectItem>
+              {categories?.map((category: any) => (
+                <SelectItem key={category.id} value={category.name}>
+                  {category.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -195,98 +200,16 @@ const AdminProducts = () => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                          {/* Xem chi tiết */}
-                          <Popover
-                            open={viewProduct?.id === product.id}
-                            onOpenChange={(open) =>
-                              !open && setViewProduct(null)
-                            }
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEditProduct(product);
+                              setEditName(product.name);
+                              setEditPrice(product.price);
+                              setEditStatus(product.status);
+                            }}
                           >
-                            <PopoverTrigger asChild>
-                              <DropdownMenuItem
-                                onClick={() => setViewProduct(product)}
-                              >
-                                Xem
-                              </DropdownMenuItem>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-64 p-4">
-                              <div className="space-y-2">
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage src={firstImage} />
-                                  <AvatarFallback>
-                                    {product.name?.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <p className="font-medium">{product.name}</p>
-                                <p>
-                                  Giá: {product.price.toLocaleString("vi-VN")}₫
-                                </p>
-                                <p>{product.stock}</p>
-                                <p>
-                                  Ngày tạo:{" "}
-                                  {new Date(
-                                    product.createdAt
-                                  ).toLocaleDateString("vi-VN")}
-                                </p>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-
-                          {/* Sửa sản phẩm */}
-                          <Popover
-                            open={editProduct?.id === product.id}
-                            onOpenChange={(open) =>
-                              !open && setEditProduct(null)
-                            }
-                          >
-                            <PopoverTrigger asChild>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setEditProduct(product);
-                                  setEditName(product.name);
-                                  setEditPrice(product.price);
-                                  setEditStatus(product.status);
-                                }}
-                              >
-                                Sửa
-                              </DropdownMenuItem>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-56 p-4 space-y-2">
-                              <Input
-                                placeholder="Tên sản phẩm"
-                                value={editName}
-                                onChange={(e) => setEditName(e.target.value)}
-                              />
-                              <Input
-                                type="number"
-                                placeholder="Giá"
-                                value={editPrice}
-                                onChange={(e) =>
-                                  setEditPrice(Number(e.target.value))
-                                }
-                              />
-                              <Select
-                                value={editStatus}
-                                onValueChange={setEditStatus}
-                              >
-                                <SelectTrigger className="w-full mt-1">
-                                  <SelectValue placeholder="Trạng thái" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="active">Active</SelectItem>
-                                  <SelectItem value="inactive">
-                                    Inactive
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Button
-                                className="w-full"
-                                onClick={handleEditProduct}
-                              >
-                                Lưu
-                              </Button>
-                            </PopoverContent>
-                          </Popover>
+                            Sửa
+                          </DropdownMenuItem>
 
                           {/* Xóa */}
                           <DropdownMenuItem

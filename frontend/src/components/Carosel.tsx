@@ -35,7 +35,7 @@ const Carosel = () => {
   }, [api]);
 
   return (
-    <div className="relative">
+    <div className="relative px-16 max-w-7xl m-auto">
       <Carousel
         opts={{
           align: "start",
@@ -49,10 +49,10 @@ const Carosel = () => {
         ]}
         setApi={setApi}
       >
-        <CarouselContent>
+        <CarouselContent className="">
           {Array.isArray(carosels) &&
             carosels.map((item: any) => (
-              <CarouselItem key={item.id} className="md:h-[100vh] ">
+              <CarouselItem key={item.id} className="max-h-[500px]">
                 <img
                   src={`${import.meta.env.VITE_SERVER_API}${item.url}`}
                   alt={item.description}

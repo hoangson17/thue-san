@@ -36,15 +36,20 @@ export const priceService = {
     return response.data;
   },
 
-  softDeletePrice: async (id: string) => {
+  softDeletePrice: async (id: number) => {
     const response = await axiosInstance.delete(
       `/prices/${id}/softdelete`
     );
     return response.data;
   },
 
-  restorePrice: async (id: string) => {
+  restorePrice: async (id: number) => {
     const response = await axiosInstance.patch(`/prices/${id}/restore`);
+    return response.data;
+  },
+
+  deletePrice: async (id: number) => {
+    const response = await axiosInstance.delete(`/prices/${id}`);
     return response.data;
   },
 };

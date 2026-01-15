@@ -143,6 +143,7 @@ const Auth: React.FC<AuthProps> = ({ type }) => {
                     placeholder="Password"
                     className="pl-12 py-6 rounded-xl"
                     required
+                    autoComplete="off"
                     value={isLogin ? loginForm.password : registerForm.password}
                     onChange={
                       isLogin ? handleLoginChange : handleRegisterChange

@@ -44,18 +44,8 @@ export class CategoriesController {
     return this.categoriesService.update(+id, data);
   }
 
-  @Patch(':id/restore')
-  restore(@Param('id') id: string) {
-    return this.categoriesService.restore(+id);
-  }
-
-  @Delete(':id/softDelete')
-  delete(@Param('id') id: string) {
-    return this.categoriesService.delete(+id);
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.categoriesService.softDelete(+id);
+    return this.categoriesService.delete(+id);
   }
 }

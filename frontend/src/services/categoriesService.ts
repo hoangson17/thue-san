@@ -22,7 +22,7 @@ export const categoriesService = {
   },
 
   updateCategory: async (id: number, data: any) => {
-    const response = await axiosInstance.put(`/categories/${id}`, data);
+    const response = await axiosInstance.patch(`/categories/${id}`, data);
     return response.data;
   },
 

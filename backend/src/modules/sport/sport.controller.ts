@@ -48,7 +48,7 @@ export class SportController {
     return this.sportService.restore(id);
   }
 
-  @Delete('delete/:id')
+  @Delete(':id')
   delete(@Param('id') id: number) {
     return this.sportService.delete(id);
   }

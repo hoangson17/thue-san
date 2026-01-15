@@ -127,4 +127,10 @@ export class AuthController {
 
     return data;
   }
+
+  @Patch('/role/:id')
+  @UseGuards(AuthGuard)
+  updateRole(@Param('id') id: number, @Body('role') role: 'admin' | 'user') {
+    return this.authService.updateRole(id, role);
+  }
 }

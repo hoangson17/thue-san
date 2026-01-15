@@ -4,6 +4,7 @@ import { Booking } from "./booking.entity";
 import { MonthlyBooking } from "./monthyBooking.entity";
 import { Cart } from "./cart.entity";
 import { Toumament } from "./toumament.entity";
+import { on } from "events";
 
 export enum UserRole {
     USER = 'user',
@@ -47,10 +48,10 @@ export class User {
     @OneToMany(()=>MonthlyBooking, monthly_booking => monthly_booking.user)
     monthly_bookings: MonthlyBooking[];
     
-    @OneToOne(() => Cart, cart => cart.user) 
+    @OneToOne(() => Cart, cart => cart.user, {onDelete: 'CASCADE'}) 
     cart: Cart; 
 
-    @ManyToMany(()=>Toumament, (toumament) => toumament.users)
+    @ManyToMany(()=>Toumament, (toumament) => toumament.users, {onDelete: 'CASCADE'})
     toumaments: Toumament[]; 
 
     @Column({ type: 'text', nullable: true })

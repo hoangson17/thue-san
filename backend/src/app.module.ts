@@ -20,6 +20,7 @@ import { UsersModule } from './modules/users/users.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { PricesModule } from './modules/prices/prices.module';
+import { CourtTypeModule } from './modules/court-type/court-type.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { PricesModule } from './modules/prices/prices.module';
     CartModule,
     CategoriesModule,
     PricesModule,
+    CourtTypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

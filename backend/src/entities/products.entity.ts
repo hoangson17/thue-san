@@ -24,7 +24,7 @@ export class Products {
     @Column({ type: 'int' })
     stock: number;
     
-    @ManyToOne(() => Categories, (category) => category.products)
+    @ManyToOne(() => Categories, (category) => category.products,{ onDelete: 'SET NULL' })
     @JoinColumn({ name: 'category_id' })
     category: Categories;
 

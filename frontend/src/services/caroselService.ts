@@ -7,12 +7,12 @@ export const caroselService = {
     },
 
     getCaroselDetail: async (id: string) => {
-        const response = await axiosInstance.get(`/carosel/${id}`);
+        const response = await axiosInstance.get(`/carosels/${id}`);
         return response.data;
     },
 
     createCarosel: async (data: any) => {
-        const response = await axiosInstance.post("/carosel", data, {
+        const response = await axiosInstance.post("/carosels", data, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
@@ -21,11 +21,16 @@ export const caroselService = {
     },
 
     updateCarosel: async (id: string, data: any) => {
-        const response = await axiosInstance.put(`/carosel/${id}`, data, {
+        const response = await axiosInstance.patch(`/carosels/${id}`, data, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
         });
+        return response.data;
+    },
+
+    deleteCarosel: async (id: number) => {
+        const response = await axiosInstance.delete(`/carosels/${id}`);
         return response.data;
     },
 };

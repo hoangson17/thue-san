@@ -1,5 +1,9 @@
 import { InjectRedis } from '@nestjs-modules/ioredis';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import Redis from 'ioredis';
@@ -351,5 +355,11 @@ export class AuthService {
 
     delete (updatedUser as any).password;
     return updatedUser;
+  }
+
+  async updateRole(id: number, role: any) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException('User không tồn tại');
+    return this.userRepository.update(id, { role });
   }
 }

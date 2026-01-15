@@ -56,6 +56,19 @@ export const authService = {
       },
     });
   },
+
+  updateRole: (id: number, role: string) =>
+    axiosInstance.patch(
+      `/auth/role/${id}`,
+      { role },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }
+    ),
+
   findAllUsers: async (params: {
     page?: number;
     limit?: number;
@@ -72,7 +85,7 @@ export const authService = {
         order: params.order,
       },
     });
-    console.log(res.data);
+    // console.log(res.data);
 
     return res.data;
   },
@@ -87,7 +100,7 @@ export const authService = {
   },
 
   deleteUser: (id: number) =>
-    axiosInstance.delete(`/user/${id}`, {
+    axiosInstance.delete(`/users/${id}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -96,7 +109,7 @@ export const authService = {
 
   restoreUser: (id: number) =>
     axiosInstance.patch(
-      `/user/restore/${id}`,
+      `/users/restore/${id}`,
       {},
       {
         headers: {
@@ -105,18 +118,32 @@ export const authService = {
       }
     ),
 
-  getUserLock: () =>
-    axiosInstance.get("/user/lock", {
+  lockUser: (id: number) =>
+    axiosInstance.delete(`/users/lock/${id}`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     }),
 
-  hardDeleteUser: (id: number) =>
-    axiosInstance.delete(`/user/hard-delete/${id}`, {
+  getAllUsersLocked: async (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+    order?: "ASC" | "DESC";
+  }) =>
+    axiosInstance.get(`/users/locked`, {
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      params: {
+        page: params.page,
+        limit: params.limit,
+        search: params.search,
+        role: params.role,
+        order: params.order,
       },
     }),
 };
