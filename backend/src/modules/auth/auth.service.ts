@@ -1,4 +1,6 @@
 import { InjectRedis } from '@nestjs-modules/ioredis';
+import { MailerService } from '@nestjs-modules/mailer';
+import { InjectQueue } from '@nestjs/bullmq';
 import {
   BadRequestException,
   Injectable,
@@ -6,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Queue } from 'bullmq';
+import { name } from 'ejs';
 import Redis from 'ioredis';
 import { Cart } from 'src/entities/cart.entity';
 import { User } from 'src/entities/user.entity';
@@ -25,6 +29,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private readonly mailService: MailerService,
+    @InjectQueue('mailRegister') private mailQueue: Queue,
     @InjectRepository(Cart) private cartRepository: Repository<Cart>,
     @InjectRedis() private readonly redis: Redis,
   ) {}
@@ -80,7 +86,27 @@ export class AuthService {
         name,
         email,
         avatar: picture,
+        provider: 'google',
       });
+      await this.mailQueue.add(
+        'send-mail',
+        {
+          to: email,
+          subject: 'Mail xác nhận đăng kí',
+          content: {
+            template: 'welcome',
+            context: {
+              name: name,
+            },
+          },
+        },
+        {
+          delay: 3000,
+          attempts: 3,
+          backoff: 5000,
+          removeOnFail: true,
+        },
+      );
       const cart = this.cartRepository.create({ user: user } as any);
       await this.cartRepository.save(cart);
     }
@@ -139,6 +165,25 @@ export class AuthService {
         avatar: profile.picture?.data?.url,
         provider: 'facebook',
       });
+      await this.mailQueue.add(
+        'send-mail',
+        {
+          to: email,
+          subject: 'Mail xác nhận đăng kí',
+          content: {
+            template: 'welcome',
+            context: {
+              name: profile.name,
+            },
+          },
+        },
+        {
+          delay: 3000,
+          attempts: 3,
+          backoff: 5000,
+          removeOnFail: true,
+        },
+      );
       const cart = this.cartRepository.create({ user } as any);
       await this.cartRepository.save(cart);
     }
@@ -295,7 +340,25 @@ export class AuthService {
 
     const newUser = this.userRepository.create(body);
     const user = await this.userRepository.save(newUser);
-
+    await this.mailQueue.add(
+      'send-mail',
+      {
+        to: email,
+        subject: 'Mail xác nhận đăng kí',
+        content: {
+          template: 'welcome',
+          context: {
+            name: name,
+          },
+        },
+      },
+      {
+        delay: 3000,
+        attempts: 3,
+        backoff: 5000,
+        removeOnFail: true,
+      },
+    );
     const cart = this.cartRepository.create({ user: user } as any);
     await this.cartRepository.save(cart);
 
@@ -314,6 +377,115 @@ export class AuthService {
       return false;
     }
     return this.createToken(user);
+  }
+
+  async testMail() {
+    const job = await this.mailQueue.add(
+      'send-mail',
+      {
+        to: 'tranhoangson03@gmail.com',
+        subject: 'Email từ queue',
+        content: 'welcome',
+      },
+      {
+        delay: 3000,
+        attempts: 3,
+        backoff: 5000,
+        removeOnFail: true,
+      },
+    );
+    return job;
+  }
+
+  async forgotPassword(body: any) {
+    const user = await this.userRepository.findOne({
+      where: { email: body.email },
+    });
+
+    if (!user) return false;
+
+    // Tạo mã xác nhận (6 chữ số)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Lưu OTP vào Redis với key là email, thời gian hết hạn 5 phút
+    await this.redis.set(`forgot-password:${body.email}`, otp, 'EX', 5 * 60);
+
+    // Gửi email chứa OTP
+    await this.mailQueue.add(
+      'send-mail-password',
+      {
+        to: body.email,
+        subject: 'MÃ XÁC NHẬN ĐẶT LẠI MẬT KHẨU',
+        content: {
+          template: 'forgotpassword',
+          context: {
+            name: user.name,
+            otp,
+          },
+        },
+      },
+      {
+        delay: 0,
+        attempts: 3,
+        backoff: 5000,
+        removeOnFail: true,
+      },
+    );
+
+    return {
+      success: true,
+      message:
+        'Mã xác nhận đã được gửi tới email của bạn. Hãy kiểm tra hộp thư.',
+    };
+  }
+
+  async resetPassword(body: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }) {
+    const { email, otp, newPassword } = body;
+
+    // 1. Kiểm tra user tồn tại
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      return {
+        success: false,
+        message: 'Người dùng không tồn tại.',
+      };
+    }
+
+    // 2. Lấy OTP trong Redis
+    const savedOtp = await this.redis.get(`forgot-password:${email}`);
+    if (!savedOtp) {
+      return {
+        success: false,
+        message: 'OTP hết hạn hoặc không tồn tại.',
+      };
+    }
+
+    // 3. So sánh OTP
+    if (savedOtp !== otp) {
+      return {
+        success: false,
+        message: 'OTP không đúng.',
+      };
+    }
+
+    // 4. Mã hóa mật khẩu mới
+    const hashedPassword = await Hash.make(newPassword);
+
+    // 5. Lưu mật khẩu mới
+    user.password = hashedPassword;
+    await this.userRepository.save(user);
+
+    // 6. Xóa OTP để tránh dùng lại
+    await this.redis.del(`forgot-password:${email}`);
+
+    return {
+      success: true,
+      message: 'Đặt lại mật khẩu thành công.',
+    };
   }
 
   async updateUser(user: any, data: any, file?: Express.Multer.File) {

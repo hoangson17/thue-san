@@ -100,6 +100,21 @@ export class AuthController {
     return result;
   }
 
+  @Post('/test')
+  test() {
+    return this.authService.testMail();
+  }
+   
+  @Post('/forgot-password')
+  async forgotPassword(@Body() body: any) {
+    return this.authService.forgotPassword(body);
+  }
+ 
+  @Post('/reset-password')
+  async resetPassword(@Body() body: any) {
+    return this.authService.resetPassword(body);
+  }
+
   @UseGuards(AuthGuard)
   @Post('/logout')
   logout(@Request() req: any) {

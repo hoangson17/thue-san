@@ -23,7 +23,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
   // console.log(user);
-  
+
   const handleLogout = () => {
     dispatch(logout() as any);
   };
@@ -120,7 +120,9 @@ const Header = () => {
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger className="outline-none">
                   <Avatar className="cursor-pointer w-10 h-10">
-                    <AvatarImage src={user?.avatar && formatImg(user?.avatar)} />
+                    <AvatarImage
+                      src={user?.avatar && formatImg(user?.avatar)}
+                    />
                     <AvatarFallback>
                       {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
                     </AvatarFallback>
@@ -160,7 +162,9 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
               <span className="font-medium text-gray-700 hidden md:block">
-                {user?.name}
+                {user?.name && user.name.length > 17
+                  ? user.name.slice(0, 15) + "..."
+                  : user?.name}
               </span>
             </>
           )}

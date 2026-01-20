@@ -10,6 +10,7 @@ import { Cart } from 'src/entities/cart.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   controllers: [AuthController],

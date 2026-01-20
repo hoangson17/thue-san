@@ -25,6 +25,8 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { BullModule } from '@nestjs/bullmq';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import Mail from './utils/mail';
+import { EmailConsumer } from './consumer/email.consumer';
 
 @Module({
   imports: [
@@ -95,6 +97,6 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
     OrdersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Mail, EmailConsumer],
 })
 export class AppModule {}
