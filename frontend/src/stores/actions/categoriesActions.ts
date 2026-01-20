@@ -3,7 +3,7 @@ import actionTypes from "./actionTypes";
 import { toast } from "sonner";
 
 export const getAllCategories =
-  (page = 1, search = "") =>
+  (page?: any, search = "") =>
   async (dispatch: any) => {
     dispatch({ type: actionTypes.GET_CATEGORIES_REQUEST });
     const limit = Number(import.meta.env.VITE_PAGE_LIMIT) || 8;
@@ -26,7 +26,7 @@ export const getCategory = (id: string) => async (dispatch: any) => {
   dispatch({ type: actionTypes.GET_CATEGORY_REQUEST });
   try {
     const response = await categoriesService.getCategory(
-      id as unknown as number
+      id as unknown as number,
     );
     dispatch({ type: actionTypes.GET_CATEGORY_SUCCESS, payload: response });
   } catch (err: any) {

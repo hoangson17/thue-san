@@ -14,8 +14,8 @@ export class Court {
     @JoinColumn({name: 'court_type'})
     court_type: CourtType
 
-    @ManyToMany(()=>CourtPricings, court_pricings => court_pricings.court)
-    court_pricings: CourtPricings[];
+    @OneToMany(()=>CourtPricings, court_pricings => court_pricings.court)
+    court_pricings: CourtPricings[]
 
     @OneToMany(()=>MonthlySlots, monthly_slots => monthly_slots.court)
     monthly_slots: MonthlySlots[];

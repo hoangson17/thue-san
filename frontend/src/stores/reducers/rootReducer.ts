@@ -14,6 +14,8 @@ import categoriesReducer from "./categoriesReducer";
 import priceReducer from "./priceReducer";
 import sportReducer from "./sportReducer";
 import courtTypeReducer from "./courtTypeReducer";
+import bookingReducer from "./booking";
+import orderReducer from "./oderReducer";
 
 const authPersistConfig = {
   key: "auth",
@@ -33,7 +35,9 @@ const appReducer = combineReducers({
   categories: categoriesReducer,
   prices: priceReducer,
   sports: sportReducer,
-  courtTypes: courtTypeReducer
+  courtTypes: courtTypeReducer,
+  bookings: bookingReducer,
+  orders: orderReducer
 });
 
 const rootReducer = (state: any, action: any) => {

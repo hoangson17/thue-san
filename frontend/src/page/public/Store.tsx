@@ -14,6 +14,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { getAllCategories } from "@/stores/actions/categoriesActions";
+import { orderService } from "@/services/orderService";
 
 const Store = () => {
   const dispatch = useDispatch();
@@ -22,16 +24,18 @@ const Store = () => {
 
   const [page, setPage] = useState(1);
   const [openFilter, setOpenFilter] = useState(
-    window.innerWidth >= 768 // mobile mặc định đóng
+    window.innerWidth >= 768
   );
 
   const { products } = useSelector((state: any) => state.products);
+  const { categories } = useSelector((state: any) => state.categories);
 
   const params = new URLSearchParams(location.search);
   const category = params.get("category") || "";
 
   useEffect(() => {
     dispatch(getProducts(page, category) as any);
+    dispatch(getAllCategories() as any);
   }, [dispatch, page, category]);
 
   const handleCategoryChange = (value?: string) => {
@@ -49,11 +53,6 @@ const Store = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const categories = [
-    { label: "Nước", value: "nước" },
-    { label: "Bánh", value: "snack" },
-    { label: "Vợt", value: "vợt" },
-  ];
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-16 py-8">
@@ -112,12 +111,12 @@ const Store = () => {
             Tất cả
           </button>
 
-          {categories.map((cat) => {
-            const active = category === cat.value;
+          {categories?.map((cat:any) => {
+            const active = category === cat.name;
             return (
               <button
-                key={cat.value}
-                onClick={() => handleCategoryChange(cat.value)}
+                key={cat.id}
+                onClick={() => handleCategoryChange(cat.name)}
                 className={`
                   px-6 py-2.5 rounded-full text-sm font-semibold transition-all
                   ${
@@ -128,7 +127,7 @@ const Store = () => {
                   focus:outline-none focus:ring-0
                 `}
               >
-                {cat.label}
+                {cat.name}
               </button>
             );
           })}

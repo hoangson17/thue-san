@@ -18,11 +18,14 @@ export class Products {
     @Column({ type: 'text', nullable: true })
     description: string;
 
-    @Column({ type: 'float' })
+    @Column({ type: 'decimal', precision: 12, scale: 2 })
     price: number;
 
-    @Column({ type: 'int' })
+    @Column({ type: 'int', default: 0 })
     stock: number;
+
+    @Column({ default: true })
+    is_active: boolean;
     
     @ManyToOne(() => Categories, (category) => category.products,{ onDelete: 'SET NULL' })
     @JoinColumn({ name: 'category_id' })

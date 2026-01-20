@@ -54,7 +54,7 @@ export class CourtController {
     return this.courtService.createCourtType(data);
   }
 
-  @Post('/softDelete/:id')
+  @Delete('/softDelete/:id')
   softDelete(@Param() id: number) {
     return this.courtService.softDelete(id);
   }
@@ -69,12 +69,12 @@ export class CourtController {
     return this.courtService.restore(id);
   }
 
-  @Post('/restoreCourtType/:id')
+  @Patch('/restoreCourtType/:id')
   restoreCourtType(@Param() id: number) {
     return this.courtService.restoreCourtType(id);
   }
 
-  @Patch('/update/:id')
+  @Patch('/:id')
   @UseInterceptors(FilesInterceptor('files', 6))
   update(
     @Param() id: number,
@@ -89,7 +89,7 @@ export class CourtController {
     return this.courtService.updateCourtType(id, data);
   }
 
-  @Delete('/delete/:id')
+  @Delete('/:id')
   delete(@Param() id: number) {
     return this.courtService.delete(id);
   }

@@ -45,13 +45,13 @@ export class ToumamentController {
     return this.toumamentService.restore(id);
   }
 
-  @Delete(':id')
-  softDelete(id: number) {
-    return this.toumamentService.softDelete(id);
-  }
+  // @Delete(':id')
+  // softDelete(id: number) {
+  //   return this.toumamentService.softDelete(id);
+  // }
 
-  @Delete(':id/delete')
-  delete(id: number) {
+  @Delete(':id')
+  delete(@Param('id') id: number) {
     return this.toumamentService.delete(id);
   }
 

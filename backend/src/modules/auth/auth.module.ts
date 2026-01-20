@@ -13,39 +13,44 @@ import { extname } from 'path';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService,AuthGuard],
+  providers: [AuthService, AuthGuard],
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true
+      isGlobal: true,
     }),
-    TypeOrmModule.forFeature([User,Cart]),
-    JwtModule.register  ({
+    TypeOrmModule.forFeature([User, Cart]),
+    JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.JWT_TOKEN_EXPIRED as unknown as number },
-    }), 
+      signOptions: {
+        expiresIn: process.env.JWT_TOKEN_EXPIRED as unknown as number,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'mailRegister',
+    }),
     MulterModule.register({
-          storage: diskStorage({
-            destination: './uploads/avatar', // Thư mục đích
-            filename: (req, file, cb) => {
-              const randomName = Array(32)
-                .fill(null)
-                .map(() => Math.round(Math.random() * 16).toString(16))
-                .join('');
-              cb(null, `${randomName}${extname(file.originalname)}`); // Tên file ngẫu nhiên
-            },
-          }),
-          limits: { fileSize: 10 * 1024 * 1024 }, // Giới hạn 10MB
-          fileFilter: (req, file, cb) => {
-            // Lọc file
-            if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
-              cb(null, true); // Cho phép
-            } else {
-              cb(null, false); // Từ chối
-            }
-          },
-        }),
+      storage: diskStorage({
+        destination: './uploads/avatar', // Thư mục đích
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`); // Tên file ngẫu nhiên
+        },
+      }),
+      limits: { fileSize: 10 * 1024 * 1024 }, // Giới hạn 10MB
+      fileFilter: (req, file, cb) => {
+        // Lọc file
+        if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+          cb(null, true); // Cho phép
+        } else {
+          cb(null, false); // Từ chối
+        }
+      },
+    }),
   ],
-  exports:[AuthService,AuthGuard]
+  exports: [AuthService, AuthGuard],
 })
 export class AuthModule {}

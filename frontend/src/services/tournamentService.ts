@@ -13,6 +13,31 @@ export const tournamentService = {
     return res.data;
   },
 
+  createTournament: async (data: any) => {
+    const res = await axiosIntance.post("/tournaments", data,{
+      headers: {
+        "Content-Type": "multipart/form-data",
+        // Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    });
+    return res.data;
+  },
+
+  updateTournament: async (id: number, data: any) => {
+    const res = await axiosIntance.patch(`/tournaments/${id}`, data,{
+      headers: {
+        "Content-Type": "multipart/form-data",
+        // Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    });
+    return res.data;
+  },
+
+  deleteTournament: async (id: number) => {
+    const res = await axiosIntance.delete(`/tournaments/${id}`);
+    return res.data;
+  },
+
   tournamentRegister: async (tournamentId: number) => {
     const res = await axiosIntance.post(
       `/tournaments-register/${tournamentId}`,

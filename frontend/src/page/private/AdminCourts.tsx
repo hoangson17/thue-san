@@ -47,19 +47,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
+import { courtService } from "@/services/courtService";
+import { toast } from "sonner";
+import { getAllCourtTypes } from "@/stores/actions/courtTypeAction";
 
 const AdminCourts = () => {
   const dispatch = useDispatch();
   const { courts, loading } = useSelector((state: any) => state.courts);
-
+  const { courtTypes } = useSelector((state: any) => state.courtTypes);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  // Modal Thêm/Sửa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourt, setEditingCourt] = useState<any>(null);
 
-  // Form state
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
   const [description, setDescription] = useState("");
@@ -69,6 +70,7 @@ const AdminCourts = () => {
 
   useEffect(() => {
     dispatch(getCourts(page, "desc", search) as any);
+    dispatch(getAllCourtTypes() as any);
   }, [dispatch, page, search]);
 
   useEffect(() => {
@@ -84,7 +86,6 @@ const AdminCourts = () => {
     }
   }, [editingCourt]);
 
-  // Reset form khi đóng modal
   const resetForm = () => {
     setName("");
     setNote("");
@@ -109,27 +110,51 @@ const AdminCourts = () => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Lưu dữ liệu
-  const handleSave = () => {
-    const data = { name, note, description, courtType, images };
-    if (editingCourt) {
-      // dispatch(updateCourt(editingCourt.id, data) as any);
-    } else {
-      // dispatch(addCourt(data) as any);
+  const handleSave = async () => {
+    try {
+      const formData = new FormData();
+
+      formData.append("name", name);
+      formData.append("note", note);
+      formData.append("description", description);
+      formData.append("court_type", courtType.toString());
+
+      images.forEach((img) => {
+        if (!img.isOld && img.file) {
+          formData.append("files", img.file);
+        }
+      });
+
+      if (editingCourt) {
+        await courtService.updateCourt(editingCourt.id, formData);
+        toast.success("Đã cập nhật sân");
+      } else {
+        await courtService.createCourt(formData);
+        toast.success("Đã tạo sân");
+      }
+
+      setIsModalOpen(false);
+      resetForm();
+      dispatch(getCourts(page, "desc", search) as any);
+    } catch {
+      toast.error("Không thể lưu sân");
     }
-    setIsModalOpen(false);
-    resetForm();
   };
 
-  const handleSoftDelete = (id: number) => {
-    // gọi API xóa
-    dispatch(getCourts(page, search) as any);
+  const handleSoftDelete = async (id: string) => {
+    try {
+      await courtService.deleteCourt(id);
+      toast.success("Đã xóa sân");
+    } catch (error) {
+      toast.error("Không thể xóa sân");
+    }
+    dispatch(getCourts(page, "desc", search) as any);
   };
 
-  const handleRestore = (id: number) => {
-    // gọi API restore
-    dispatch(getCourts(page, search) as any);
-  };
+  // const handleRestore = (id: number) => {
+  //   // gọi API restore
+  //   dispatch(getCourts(page, "desc", search) as any);
+  // };
 
   return (
     <div className="space-y-6">
@@ -206,8 +231,11 @@ const AdminCourts = () => {
                     <SelectValue placeholder="Chọn loại sân" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Sân đơn</SelectItem>
-                    <SelectItem value="2">Sân đôi</SelectItem>
+                    {courtTypes?.map((type: any) => (
+                      <SelectItem key={type.id} value={type.id.toString()}>
+                        {type?.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {/* Upload ảnh */}
@@ -336,7 +364,7 @@ const AdminCourts = () => {
                         {court.deletedAt ? (
                           <DropdownMenuItem
                             className="text-success"
-                            onClick={() => handleRestore(court.id)}
+                            // onClick={() => handleRestore(court.id)}
                           >
                             Khôi phục
                           </DropdownMenuItem>

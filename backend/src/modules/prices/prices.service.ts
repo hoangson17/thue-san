@@ -23,7 +23,9 @@ export class PricesService {
   }) {
     const where: any = {};
     if (search) {
-      where.name = Like(`%${search}%`);
+      where.court = {
+        name: Like(`%${search}%`),
+      };
     }
     const options: any = {
       where,
@@ -43,19 +45,19 @@ export class PricesService {
   }
 
   async create(data: any) {
-    const { court, ...pricingData } = data;
+    const { courtId, ...pricingData } = data;
+    console.log(data);
 
-    const pricing = this.courtPricingsRepository.create(pricingData);
-
-    if (court?.length) {
-      pricing['court']= court.map((id: number) => ({ id }) as any);
-    }
+    const pricing = this.courtPricingsRepository.create({
+      ...pricingData,
+      court: { id: courtId },
+    });
 
     return this.courtPricingsRepository.save(pricing);
   }
 
   async update(id: number, data: any) {
-    const { court, ...pricingData } = data;
+    const { courtId, ...pricingData } = data;
 
     const pricing = await this.courtPricingsRepository.findOne({
       where: { id },
@@ -64,10 +66,20 @@ export class PricesService {
 
     if (!pricing) throw new Error('Not found');
 
-    Object.assign(pricing, pricingData);
+    let hasChange = false;
 
-    if (court) {
-      pricing.court = court.map((id: number) => ({ id }) as any);
+    if (Object.keys(pricingData).length) {
+      Object.assign(pricing, pricingData);
+      hasChange = true;
+    }
+
+    if (courtId) {
+      pricing.court = { id: courtId } as any;
+      hasChange = true;
+    }
+
+    if (!hasChange) {
+      throw new Error('No data to update');
     }
 
     return this.courtPricingsRepository.save(pricing);

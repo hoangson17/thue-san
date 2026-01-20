@@ -19,27 +19,17 @@ export class CourtPricings {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => Court, (court) => court.court_pricings, {
+  @ManyToOne(() => Court, (court) => court.court_pricings, {
     onDelete: 'CASCADE',
   })
-  @JoinTable({
-    name: 'pricings',
-    joinColumn: {
-      name: 'court_pricings_id',
-      referencedColumnName: 'id', 
-    },
-    inverseJoinColumn: {
-      name: 'court_id',
-      referencedColumnName: 'id',
-    },
-  })
-  court: Court[];
+  @JoinColumn({ name: 'court_id' }) 
+  court: Court;
 
   @Column({
     type: 'enum',
     enum: DayType,
     default: DayType.WEEKDAY,
-  })  
+  })
   dayType: DayType;
 
   @Column({ type: 'varchar', length: 100 })

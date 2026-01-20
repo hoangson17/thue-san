@@ -15,6 +15,8 @@ import {
   OrderCourt,
   RegisterTounament,
   Facebook,
+  OrderProducts,
+  BookingCourt,
 } from "./page/public";
 import Google from "./page/public/Google";
 import { Toaster } from "sonner";
@@ -31,9 +33,9 @@ import AdminCategories from "./page/private/AdminCategories";
 import AdminPrice from "./page/private/AdminPrice";
 import AdminCarosel from "./page/private/AdminCarosel";
 import LockedUser from "./page/private/LockedUser";
-import AdminBocking from "./page/private/AdminBocking";
 import CourtTypes from "./page/private/CourtTypes";
 import Sport from "./page/private/Sport";
+import AdminBooking from "./page/private/AdminBooking";
 
 function App() {
   return (
@@ -53,7 +55,8 @@ function App() {
             <Route element={<AuthMiddleware />}>
               <Route path="/profile" element={<Profile />} />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/order-courts" element={<OrderCourt />} />
+              <Route path="/booking-courts" element={<BookingCourt />} />
+              <Route path="/order-product" element={<OrderProducts />} />
               <Route
                 path="/register-tournament"
                 element={<RegisterTounament />}
@@ -78,7 +81,7 @@ function App() {
                 <Route path="prices" element={<AdminPrice />} />
                 <Route path="carosels" element={<AdminCarosel />} />
                 <Route path="profile" element={<Profile />} />
-                <Route path="bookings" element={<AdminBocking />} />
+                <Route path="bookings" element={<AdminBooking />} />
                 <Route path="court-type" element={<CourtTypes />} />
                 <Route path="sports" element={<Sport />} />
               </Route>

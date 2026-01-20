@@ -56,14 +56,14 @@ const AdminPrice = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [price, setPrice] = useState(0);
-  const [selectedCourts, setSelectedCourts] = useState<number[]>([]);
+  const [selectedCourts, setSelectedCourts] = useState<number | null>(null);
 
   const resetForm = () => {
     setDayType("weekday");
     setStartTime("");
     setEndTime("");
     setPrice(0);
-    setSelectedCourts([]);
+    setSelectedCourts(0);
     setEditingPrice(null);
   };
 
@@ -73,17 +73,17 @@ const AdminPrice = () => {
       setStartTime(editingPrice.timeStart);
       setEndTime(editingPrice.timeEnd);
       setPrice(editingPrice.price_per_hour);
-      setSelectedCourts(editingPrice.court?.map((c: any) => c.id) || []);
+      setSelectedCourts(editingPrice?.court?.id);
       setIsModalOpen(true);
     }
   }, [editingPrice]);
 
   useEffect(() => {
     dispatch(getPrices(page, search) as any);
-    dispatch(getCourts(page, search) as any);
+    dispatch(getCourts() as any);
   }, [dispatch, page, search]);
 
-  // console.log(prices);
+  console.log(prices);
 
   const handleSave = async () => {
     const data = {
@@ -91,7 +91,7 @@ const AdminPrice = () => {
       timeStart: startTime,
       timeEnd: endTime,
       price_per_hour: price,
-      court: selectedCourts,
+      courtId: selectedCourts,
     };
 
     try {
@@ -133,7 +133,7 @@ const AdminPrice = () => {
         <div className="w-[300px]">
           <input
             type="text"
-            placeholder="Tìm theo khung giờ..."
+            placeholder="Tìm theo giá theo sân..."
             value={search}
             onChange={(e) => {
               setPage(1);
@@ -181,19 +181,19 @@ const AdminPrice = () => {
                   <div className="flex flex-col col-span-2">
                     <label htmlFor="court">Sân áp dụng</label>
                     <select
-                      multiple
                       className="border rounded-md px-2 py-1"
-                      value={selectedCourts.map(String)}
-                      onChange={(e) => {
-                        const values = Array.from(e.target.selectedOptions).map(
-                          (opt) => Number(opt.value)
-                        );
-                        setSelectedCourts(values);
-                      }}
+                      value={selectedCourts ?? ""}
+                      onChange={(e) =>
+                        setSelectedCourts(Number(e.target.value))
+                      }
                     >
+                      <option value="" disabled>
+                        -- Chọn sân --
+                      </option>
+
                       {courts?.data?.map((court: any) => (
-                        <option key={court.id} value={court.id}>
-                          {court.name}
+                        <option key={court?.id} value={court?.id}>
+                          {court?.name}
                         </option>
                       ))}
                     </select>
@@ -300,9 +300,7 @@ const AdminPrice = () => {
                   <TableCell className=" font-semibold">
                     {price.price_per_hour.toLocaleString()} đ
                   </TableCell>
-                  <TableCell>
-                    {price.court?.map((c: any) => c.name).join(", ")}
-                  </TableCell>
+                  <TableCell>{price?.court?.name}</TableCell>
 
                   <TableCell className="text-center">
                     <DropdownMenu>
@@ -344,19 +342,21 @@ const AdminPrice = () => {
               />
             </PaginationItem>
 
-            {Array.from({ length: prices?.pagination?.totalPages }).map((_, index) => {
-              const pageNumber = index + 1;
-              return (
-                <PaginationItem key={pageNumber}>
-                  <PaginationLink
-                    isActive={page === pageNumber}
-                    onClick={() => setPage(pageNumber)}
-                  >
-                    {pageNumber}
-                  </PaginationLink>
-                </PaginationItem>
-              );
-            })}
+            {Array.from({ length: prices?.pagination?.totalPages }).map(
+              (_, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      isActive={page === pageNumber}
+                      onClick={() => setPage(pageNumber)}
+                    >
+                      {pageNumber}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              }
+            )}
 
             <PaginationItem>
               <PaginationNext

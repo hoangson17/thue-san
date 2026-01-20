@@ -139,13 +139,13 @@ const Header = () => {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
-                    <Link to="/order-courts">Sân đã đặt</Link>
+                    <Link to="/booking-courts">Sân đã đặt</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/register-tournament">Giải đấu đã đăng kí</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/save-tournament">Giải đấu đã lưu</Link>
+                    <Link to="/order-product">Đơn hàng đã đặt</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/settings">Setting</Link>

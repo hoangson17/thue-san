@@ -74,10 +74,10 @@ const CartItem = ({ product }: any) => {
           <Trash2 size={18} />
           Xóa
         </Button>
-        <Button className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white font-medium rounded-md hover:bg-green-800 transition cursor-pointer">
+        {/* <Button className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white font-medium rounded-md hover:bg-green-800 transition cursor-pointer">
           <CreditCard size={18} />
           Thanh toán
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

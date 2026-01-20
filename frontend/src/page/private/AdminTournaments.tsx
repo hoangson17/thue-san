@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Plus } from "lucide-react";
-import { getTournament} from "@/stores/actions/tournamentActions";
+import { getTournament } from "@/stores/actions/tournamentActions";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -38,6 +38,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { TipTapEditor } from "@/components/TipTapEditor";
+import { tournamentService } from "@/services/tournamentService";
+import { toast } from "sonner";
 
 const formatDate = (date?: string | null) =>
   date ? new Date(date).toLocaleDateString("vi-VN") : "—";
@@ -46,30 +48,30 @@ const formatPrice = (price?: string | number) =>
 
 const AdminTournaments = () => {
   const dispatch = useDispatch();
-  const { tournaments, loading } = useSelector((state: any) => state.tournaments);
+  const { tournaments, loading } = useSelector(
+    (state: any) => state.tournaments
+  );
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  // Modal Thêm/Sửa
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTournament, setEditingTournament] = useState<any>(null);
 
-  // Form state
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [startDate, setStartDate] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [details, setDetails] = useState("");
+  const [introduce, setIntroduce] = useState("");
+  const [organizer, setOrganizer] = useState("");
   const [images, setImages] = useState<any[]>([]); // file mới hoặc ảnh cũ
 
-  // Load dữ liệu table
   useEffect(() => {
     dispatch(getTournament(page, "DESC", search) as any);
   }, [dispatch, page, search]);
 
-  // Điền form khi sửa
   useEffect(() => {
     if (editingTournament) {
       setName(editingTournament.name || "");
@@ -82,14 +84,18 @@ const AdminTournaments = () => {
       setAddress(editingTournament.address || "");
       setDescription(editingTournament.description || "");
       setDetails(editingTournament.details || "");
+      setIntroduce(editingTournament.introduce || "");
+      setOrganizer(editingTournament.organizer || "");
       setImages(
-        editingTournament.images?.map((img: any) => ({ ...img, isOld: true })) || []
+        editingTournament.images?.map((img: any) => ({
+          ...img,
+          isOld: true,
+        })) || []
       );
       setIsModalOpen(true);
     }
   }, [editingTournament]);
 
-  // Reset form khi đóng modal
   const resetForm = () => {
     setName("");
     setPrice("");
@@ -97,6 +103,8 @@ const AdminTournaments = () => {
     setAddress("");
     setDescription("");
     setDetails("");
+    setIntroduce("");
+    setOrganizer("");
     setImages([]);
     setEditingTournament(null);
   };
@@ -117,16 +125,55 @@ const AdminTournaments = () => {
   };
 
   // Lưu dữ liệu
-  const handleSave = () => {
-    const data = { name, price, start_date: startDate, address, description, details, images };
-    if (editingTournament) {
-      // dispatch(updateTournament(editingTournament.id, data) as any);
-    } else {
-      // dispatch(addTournament(data) as any);
+  const handleSave = async () => {
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("start_date", startDate);
+    formData.append("address", address);
+    formData.append("description", description);
+    formData.append("details", details);
+    formData.append("introduce", introduce);
+    formData.append("organizer", organizer);
+
+    images.forEach((img) => {
+      if (!img.isOld && img.file) {
+        formData.append("files", img.file);
+      }
+    });
+
+    try {
+      if (editingTournament) {
+        await tournamentService.updateTournament(
+          editingTournament.id,
+          formData
+        );
+        toast.success("Đã cập nhật giải đấu");
+      } else {
+        await tournamentService.createTournament(formData);
+        toast.success("Đã tạo giải đấu");
+      }
+    } catch (error) {
+      toast.error(
+        `Không thể ${editingTournament ? "cập nhật" : "tạo"} giải đấu`
+      );
     }
+
     setIsModalOpen(false);
     resetForm();
+    dispatch(getTournament(page, "DESC", search) as any);
   };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await tournamentService.deleteTournament(id);
+      toast.success("Đã xóa giải đấu");
+    } catch (error) {
+      toast.error("Không thể xóa giải đấu");
+    }
+    dispatch(getTournament(page, "DESC", search) as any);
+  }
 
   const data = tournaments?.data || [];
   const pagination = tournaments?.pagination;
@@ -169,7 +216,9 @@ const AdminTournaments = () => {
             <DialogContent className="sm:max-w-[600px] h-[80vh] overflow-auto scrollbar-hide">
               <DialogHeader>
                 <DialogTitle>
-                  {editingTournament ? "Chỉnh sửa giải đấu" : "Thêm giải đấu mới"}
+                  {editingTournament
+                    ? "Chỉnh sửa giải đấu"
+                    : "Thêm giải đấu mới"}
                 </DialogTitle>
                 <DialogDescription>
                   Nhập thông tin giải đấu để lưu vào hệ thống.
@@ -204,6 +253,17 @@ const AdminTournaments = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
+                <Input
+                  placeholder="Giới thiệu giải đấu"
+                  value={introduce}
+                  onChange={(e) => setIntroduce(e.target.value)}
+                />
+
+                <Input
+                  placeholder="Ban tổ chức"
+                  value={organizer}
+                  onChange={(e) => setOrganizer(e.target.value)}
+                />
 
                 {/* Upload ảnh */}
                 <div>
@@ -217,9 +277,15 @@ const AdminTournaments = () => {
                   />
                   <div className="flex gap-2 flex-wrap">
                     {images.map((img, idx) => (
-                      <div key={idx} className="relative w-20 h-20 rounded overflow-hidden border">
+                      <div
+                        key={idx}
+                        className="relative w-20 h-20 rounded overflow-hidden border"
+                      >
                         <img
-                          src={img.preview || `${import.meta.env.VITE_SERVER_API}${img.url}`}
+                          src={
+                            img.preview ||
+                            `${import.meta.env.VITE_SERVER_API}${img.url}`
+                          }
                           alt="preview"
                           className="w-full h-full object-cover"
                         />
@@ -237,7 +303,9 @@ const AdminTournaments = () => {
 
                 {/* TipTap details */}
                 <div>
-                  <label className="mb-1 block font-medium">Chi tiết giải đấu</label>
+                  <label className="mb-1 block font-medium">
+                    Chi tiết giải đấu
+                  </label>
                   <TipTapEditor value={details} onChange={setDetails} />
                 </div>
               </div>
@@ -286,7 +354,9 @@ const AdminTournaments = () => {
                     <img
                       src={
                         t.images?.[0]?.url
-                          ? `${import.meta.env.VITE_SERVER_API}${t.images[0].url}`
+                          ? `${import.meta.env.VITE_SERVER_API}${
+                              t.images[0].url
+                            }`
                           : "/placeholder.png"
                       }
                       className="h-12 w-20 rounded-md object-cover"
@@ -312,10 +382,12 @@ const AdminTournaments = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingTournament(t)}>
+                        <DropdownMenuItem
+                          onClick={() => setEditingTournament(t)}
+                        >
                           Sửa
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem onClick={() => handleDelete(t.id)} className="text-destructive">
                           Xóa
                         </DropdownMenuItem>
                       </DropdownMenuContent>

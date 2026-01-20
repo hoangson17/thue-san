@@ -21,6 +21,10 @@ import { CartModule } from './modules/cart/cart.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { PricesModule } from './modules/prices/prices.module';
 import { CourtTypeModule } from './modules/court-type/court-type.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { BullModule } from '@nestjs/bullmq';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 
 @Module({
   imports: [
@@ -33,7 +37,7 @@ import { CourtTypeModule } from './modules/court-type/court-type.module';
       port: process.env.DB_PORT as unknown as number,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME, 
+      database: process.env.DB_NAME,
       entities: ['dist/entities/*.entity{.ts,.js}'],
       synchronize:
         process.env.NODE_ENV === 'development' || !process.env.NODE_ENV,
@@ -45,7 +49,7 @@ import { CourtTypeModule } from './modules/court-type/court-type.module';
       url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),  
+      rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
     CourtModule,
@@ -59,6 +63,25 @@ import { CourtTypeModule } from './modules/court-type/court-type.module';
         },
       }),
     }),
+    MailerModule.forRoot({
+      transport: `smtps://${process.env.MAIL_USERNAME}:${process.env.MAIL_PASSWORD}@${process.env.MAIL_HOST}`,
+      defaults: {
+        from: `"${process.env.MAIL_FROM_NAME}" <${process.env.MAIL_FROM}>`,
+      },
+      template: {
+        dir: __dirname + '/mail/templates',
+        adapter: new EjsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
     ProductsModule,
     CaroselsModule,
     BookingModule,
@@ -69,6 +92,7 @@ import { CourtTypeModule } from './modules/court-type/court-type.module';
     CategoriesModule,
     PricesModule,
     CourtTypeModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
