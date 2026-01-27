@@ -14,7 +14,7 @@ const Court = () => {
   }, [dispatch, page]);
 
   return (
-    <div className="px-16 py-10 max-w-7xl mx-auto">
+    <div className="px-6 py-10 max-w-7xl mx-auto">
       <div className='text-center mb-7'><h1 className='mx-auto text-3xl font-bold uppercase'>Các sân hiện có</h1></div>
       <ListCourt items={courts.data} />
       <div className="mt-[40px]">

@@ -11,6 +11,7 @@ import {
   IconImageInPicture,
   IconInnerShadowTop,
   IconMapPinDollar,
+  IconMessage,
   IconPackage,
   IconPictureInPicture,
   IconReport,
@@ -75,6 +76,11 @@ const data = {
       title: "Hóa đơn",
       url: "/admin/bookings",
       icon: IconCards,
+    },
+    {
+      title: "Chats",
+      url: "/admin/chats",
+      icon: IconMessage,
     },
   ],
   navSecondary: [

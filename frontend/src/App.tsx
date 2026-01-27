@@ -36,6 +36,7 @@ import LockedUser from "./page/private/LockedUser";
 import CourtTypes from "./page/private/CourtTypes";
 import Sport from "./page/private/Sport";
 import AdminBooking from "./page/private/AdminBooking";
+import AdminChat from "./page/private/AdminChat";
 
 function App() {
   return (
@@ -84,6 +85,7 @@ function App() {
                 <Route path="bookings" element={<AdminBooking />} />
                 <Route path="court-type" element={<CourtTypes />} />
                 <Route path="sports" element={<Sport />} />
+                <Route path="chats" element={<AdminChat />} />
               </Route>
             </Route>
           </Route>

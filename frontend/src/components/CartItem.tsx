@@ -29,7 +29,7 @@ const CartItem = ({ product }: any) => {
   };
 
   return (
-    <div className="flex items-center gap-6 border-b py-4">
+    <div className="flex items-center gap-6 border-b py-4 px-4">
       <div className="w-30">
         <img
           src={`${import.meta.env.VITE_SERVER_API}${

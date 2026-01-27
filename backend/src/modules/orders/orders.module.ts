@@ -10,6 +10,7 @@ import { OrderItem } from 'src/entities/order-item.entity';
 import { Products } from 'src/entities/products.entity';
 import { AuthService } from '../auth/auth.service';
 import { AuthModule } from '../auth/auth.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   controllers: [OrdersController],
@@ -19,6 +20,9 @@ import { AuthModule } from '../auth/auth.module';
       isGlobal: true,
     }),
     TypeOrmModule.forFeature([Cart, CartItem, Order, OrderItem, Products]),
+    BullModule.registerQueue({
+      name: 'order',
+    }),
     AuthModule
   ],
 })

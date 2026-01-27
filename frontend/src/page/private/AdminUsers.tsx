@@ -183,7 +183,7 @@ const AdminUsers = () => {
 
                     <TableCell className="text-center">
                       <Avatar className="mx-auto h-9 w-9">
-                        <AvatarImage src={formatImg(user?.avatar) || ""} />
+                        <AvatarImage src={user?.avatar && formatImg(user?.avatar) || ""} />
                         <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
                       </Avatar>
                     </TableCell>

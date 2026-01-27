@@ -27,6 +27,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import Mail from './utils/mail';
 import { EmailConsumer } from './consumer/email.consumer';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { EmailConsumer } from './consumer/email.consumer';
     PricesModule,
     CourtTypeModule,
     OrdersModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService, Mail, EmailConsumer],

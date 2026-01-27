@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
     }
     const jti = decode.jti;
     // check black list
-    const blackList = await this.redis.get(`blacklist_${decode.jti}`);
+    const blackList = await this.redis.get(`jti_blacklist_${decode.jti}`);
     if(blackList){
       throw new UnauthorizedException("Unauthrized");
     }

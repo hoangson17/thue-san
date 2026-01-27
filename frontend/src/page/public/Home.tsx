@@ -1,5 +1,6 @@
 import { Footer, Header } from '@/components'
 import FloatingButton from '@/components/FloatingButton'
+import { ScrollToTopButton } from '@/components/ScrollToTopButton'
 import { Outlet } from 'react-router-dom'
 
 const Home = () => {
@@ -10,6 +11,7 @@ const Home = () => {
         <Outlet />
     </div>
     <Footer />
+    <ScrollToTopButton />
     <FloatingButton/>
     </>
   )

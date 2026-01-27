@@ -8,14 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-/* ===== helpers ===== */
 const formatDate = (date: string) => new Date(date).toLocaleDateString("vi-VN");
 
 const formatTime = (time: string) => time.slice(0, 5);
 
 const formatPrice = (price: number) => price.toLocaleString("vi-VN") + " ₫";
 
-/* ===== component ===== */
 const BookingCourt = () => {
   const dispatch = useDispatch();
   const { bookingsByUser } = useSelector((state: any) => state.bookings);
@@ -26,7 +24,6 @@ const BookingCourt = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-16 py-10">
-      {/* Header */}
       <div className="mb-8 flex items-center gap-3">
         <div className="p-3 rounded-xl bg-primary/10 text-primary">
           <Calendar className="w-6 h-6" />

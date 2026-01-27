@@ -1,38 +1,47 @@
-  import React from "react";
-  import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-  import { Link } from "react-router-dom";
-  import img from "../assets/image_3.png";
+import React from "react";
+import { Link } from "react-router-dom";
+import defaultImg from "../assets/image_3.png";
+import { IconMedal } from "@tabler/icons-react";
 
-  const TournamentItem = ({ item }: any) => {
-    return (
-      <Card className="overflow-hidden">
-        <Link className="flex flex-col gap-2" to={`/tournaments/${item.id}`}>
-          <CardHeader className="">
-            <CardTitle>{item?.name}</CardTitle>
-            {item.images?.length > 0 ? (
-              <img
-                src={`${import.meta.env.VITE_SERVER_API}${item.images[0].url}`}
-                alt={item.name}
-                className="w-full h-40 object-cover rounded-md"
-              />
-            ) : (
-              <img
-                src={img}
-                alt={item.name}
-                className="w-full h-40 object-cover rounded-md"
-              />
-            )}
-          </CardHeader>
-          <CardContent>
-            <div className="mt-2 flex flex-col gap-0.5">
-              <p>{item?.introduce}</p>
-              <p>Giải thưởng: {item?.price}đ</p>
-              <small className="truncate w-full text-gray-500">{item?.description}</small>
-            </div>
-          </CardContent>
-        </Link>
-      </Card>
-    );
-  };
+const TournamentItem = ({ item }: any) => {
+  const imageUrl = item.images?.[0]?.url
+    ? `${import.meta.env.VITE_SERVER_API}${item.images[0].url}`
+    : defaultImg;
 
-  export default TournamentItem;
+  // Format tiền nhanh gọn
+  const price = item.price?.toLocaleString("vi-VN");
+
+  return (
+    <Link 
+      to={`/tournaments/${item.id}`} 
+      className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+    >
+      <div className="relative aspect-[16/10] overflow-hidden">
+        <img
+          src={imageUrl}
+          alt={item.name}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+        />
+        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+          <span className="text-xs font-bold text-red-600 flex items-center gap-1"><IconMedal /><span> {price}đ</span></span>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <h3 className="text-lg font-bold text-gray-800 line-clamp-1 transition-colors">
+          {item?.name}
+        </h3>
+        
+        <p className="text-sm text-gray-500 mt-1 font-medium line-clamp-1">
+          {item?.introduce}
+        </p>
+
+        <p className="text-xs text-gray-400 mt-3 line-clamp-2 leading-relaxed">
+          {item?.description}
+        </p>
+      </div>
+    </Link>
+  );
+};
+
+export default TournamentItem;

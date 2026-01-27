@@ -35,7 +35,7 @@ const Carosel = () => {
   }, [api]);
 
   return (
-    <div className="relative px-16 max-w-7xl m-auto">
+    <div className="relative px-6 max-w-7xl m-auto">
       <Carousel
         opts={{
           align: "start",

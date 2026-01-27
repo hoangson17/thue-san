@@ -11,7 +11,7 @@ import img7 from "../assets/3.png";
 const HomeIntro = () => {
   return (
     <div>
-      <div className="px-16 pt-16 grid md:grid-cols-3 sm:grid-cols-1 max-w-7xl mx-auto">
+      <div className="px-6 pt-16 grid md:grid-cols-3 sm:grid-cols-1 max-w-7xl mx-auto">
         <div className="flex flex-col gap-4 text-center justify-center md:px-5 md:border-r border-gray-300 w-full">
           <img src={img3} className="w-30 m-auto" alt="" />
           <h2 className="text-3xl font-bold">Tìm kiếm vị trí sân</h2>
@@ -37,7 +37,7 @@ const HomeIntro = () => {
           </p>
         </div>
       </div>
-      <div className="px-16 pt-20">
+      <div className="px-6 pt-20">
         <div className="text-center">
           <h3 className="text-xl font-medium">Liên hệ</h3>
           <h1 className="text-3xl font-bold">Nhận báo giá</h1>
@@ -54,7 +54,7 @@ const HomeIntro = () => {
         </div>
       </div>
 
-      <div className="px-16 pt-20">
+      <div className="px-6 pt-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto text-center">
           <Card className="flex flex-col justify-between">
             <CardContent className="flex flex-col gap-4">
