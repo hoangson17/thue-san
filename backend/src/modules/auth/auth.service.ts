@@ -204,7 +204,9 @@ export class AuthService {
 
   verifyToken = (token: string) => {
     try {
-      const decode = this.jwtService.verify(token);
+      const decode = this.jwtService.verify(token,{
+        secret: process.env.JWT_SECRET,
+      });
       return decode;
     } catch (error) {
       return null;
@@ -221,18 +223,19 @@ export class AuthService {
       return null;
     }
   };
-
+ 
   async refreshToken(body: any) {
     const refreshToken = body.refreshToken;
     try {
       const decode = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_TOKEN_SECRET,
       });
+      const jtiAccessToken = uuid();
       const token = this.jwtService.sign({
         userId: decode.userId,
         email: decode.email,
         role: decode.role,
-        jti: uuid(),
+        jti: jtiAccessToken,
       });
       const jtiRefreshToken = decode.jti;
       const accessToken = await this.redis.get(
@@ -240,15 +243,35 @@ export class AuthService {
       );
       if (accessToken) {
         const now = Date.now() / 1000;
-        const { exp, jtiAccessToken } = JSON.parse(accessToken);
+        const { exp, jtiAccessToken: oldJtiAccessToken } = JSON.parse(accessToken);
         if (now < exp) {
           await this.redis.set(
-            `jti_blacklist_${jtiAccessToken}`,
-            jtiAccessToken,
+            `jti_blacklist_${oldJtiAccessToken}`,
+            oldJtiAccessToken,
             'EX',
             Math.round(exp - now),
           );
         }
+        const { exp: expAccessToken } = this.verifyToken(token);
+        const refreshTTL = Math.max(1, Math.round(decode.exp - now));
+
+        await this.redis.set(
+          `jwt_refresh_${jtiRefreshToken}`,
+          JSON.stringify({
+            jtiAccessToken,
+            exp: expAccessToken,
+            userId: decode.userId,
+          }),
+          'EX',
+          refreshTTL,
+        );
+
+        await this.redis.set(
+          `Device_${decode.userId}`,
+          jtiAccessToken,
+          'EX',
+          Math.max(1, Math.round(expAccessToken - now)),
+        );
       } else {
         return false;
       }
@@ -305,12 +328,12 @@ export class AuthService {
       'EX',
       Math.round(expRefreshToken - Date.now() / 1000),
     );
-    await this.redis.set(
-      `Device_${user.id}`,
-      jtiAccessToken,
-      'EX',
-      Math.round(expAccessToken - Date.now() / 1000),
-    );
+    // await this.redis.set(
+    //   `Device_${user.id}`,
+    //   jtiAccessToken,
+    //   'EX',
+    //   Math.round(expAccessToken - Date.now() / 1000),
+    // );
     await this.redis.keys(`jwt_refresh_*`);
 
     delete (user as any).password;

@@ -6,7 +6,6 @@ export const cartService = {
     const response = await axiosInstance.get(`/cart`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
     return response.data;
@@ -16,7 +15,6 @@ export const cartService = {
     const response = await axiosInstance.post(`/cart`, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
     return response.data;
@@ -26,7 +24,6 @@ export const cartService = {
     const response = await axiosInstance.delete(`/cart/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
     return response.data;

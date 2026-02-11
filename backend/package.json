@@ -33,6 +33,7 @@
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.12",
+    "@payos/node": "^2.0.4",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.66.5",
     "class-transformer": "^0.5.1",

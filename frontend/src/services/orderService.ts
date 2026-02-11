@@ -10,7 +10,6 @@ export const orderService = {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       },
     );
@@ -34,7 +33,6 @@ export const orderService = {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       },
     );
@@ -50,7 +48,6 @@ export const orderService = {
       },
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
   },

@@ -14,21 +14,12 @@ export const authService = {
       accessToken: accessTokenFromFacebook,
     }),
 
+  getProfile: () => axiosInstance.get("/auth/profile",{}),
+
   register: (body: any) => axiosInstance.post("/auth/register", body),
 
   logout: () => {
-    axiosInstance.post(
-      "/auth/logout",
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      }
-    );
-    localStorage.removeItem("persist:auth");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    axiosInstance.post("/auth/logout",{});
     delete axiosInstance.defaults.headers.common["Authorization"];
   },
 
@@ -52,7 +43,6 @@ export const authService = {
     return axiosInstance.patch("/auth/profile", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
   },
@@ -64,7 +54,6 @@ export const authService = {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }
     ),
@@ -93,7 +82,6 @@ export const authService = {
   findOneUser: async () => {
     const res = await axiosInstance.get("/users", {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
     return res.data;
@@ -103,7 +91,6 @@ export const authService = {
     axiosInstance.delete(`/users/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     }),
 
@@ -111,18 +98,12 @@ export const authService = {
     axiosInstance.patch(
       `/users/restore/${id}`,
       {},
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      }
     ),
 
   lockUser: (id: number) =>
     axiosInstance.delete(`/users/lock/${id}`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     }),
 
@@ -136,7 +117,6 @@ export const authService = {
     axiosInstance.get(`/users/locked`, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
       params: {
         page: params.page,

@@ -38,11 +38,11 @@ export class AuthGuard implements CanActivate {
     request.user = user;
     request.user.jti = jti;
     request.user.exp = decode.exp;
-    const device = await this.redis.get(`Device_${request.user.id}`);
+    // const device = await this.redis.get(`Device_${request.user.id}`);
     
-    if(device !== request.user.jti){
-      return false;
-    }
+    // if(device !== request.user.jti){
+    //   return false;
+    // }
     (await this.redis.keys(`jwt_refresh_*`)).forEach(async (jti) => {
      const refreshOnRedis = await this.redis.get(jti);
       if (refreshOnRedis) {

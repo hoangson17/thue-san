@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận đơn hàng</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; }
+        .header { text-align: center; background-color: #f8f8f8; padding: 20px; }
+        .order-info { margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; border-bottom: 2px solid #eee; padding: 10px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .total { font-weight: bold; font-size: 1.2em; color: #d9534f; }
+        .footer { text-align: center; font-size: 0.8em; color: #777; margin-top: 30px; }
+        .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Cảm ơn bạn đã đặt hàng!</h2>
+            <p>Xin chào **<%= customerName %>**, đơn hàng của bạn đã được tiếp nhận thành công.</p>
+        </div>
+
+        <div class="order-info">
+            <p><strong>Mã đơn hàng:</strong> #<%= orderId %></p>
+            <p><strong>Trạng thái:</strong> Đang xử lý</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% items.forEach(function(item) { %>
+                    <tr>
+                        <td><%= item.name %></td>
+                        <td>x <%= item.quantity %></td>
+                        <td><%= item.price.toLocaleString('vi-VN') %>đ</td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <div style="text-align: right; margin-top: 20px;">
+            <p class="total">Tổng cộng: <%= totalAmount.toLocaleString('vi-VN') %>đ</p>
+        </div>
+
+        <div class="footer">
+            <p>Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ hotro@yourwebsite.com</p>
+            <p>&copy; 2026 Your Store. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

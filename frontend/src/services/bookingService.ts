@@ -5,7 +5,6 @@ export const bookingService = {
         const response = await AxiosInstance.get("/booking",{
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
         });
         return response.data;
@@ -21,7 +20,6 @@ export const bookingService = {
             },
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
         });
         return response.data;
@@ -31,7 +29,6 @@ export const bookingService = {
         const response = await AxiosInstance.get(`/booking/user`,{
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
         });
         return response.data;
@@ -41,7 +38,6 @@ export const bookingService = {
         const response = await AxiosInstance.post("/booking", data, {
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             },
         });
         return response.data;

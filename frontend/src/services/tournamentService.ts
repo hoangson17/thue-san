@@ -17,7 +17,6 @@ export const tournamentService = {
     const res = await axiosIntance.post("/tournaments", data,{
       headers: {
         "Content-Type": "multipart/form-data",
-        // Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
     return res.data;
@@ -27,7 +26,6 @@ export const tournamentService = {
     const res = await axiosIntance.patch(`/tournaments/${id}`, data,{
       headers: {
         "Content-Type": "multipart/form-data",
-        // Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
       },
     });
     return res.data;
@@ -45,7 +43,6 @@ export const tournamentService = {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       }
     );

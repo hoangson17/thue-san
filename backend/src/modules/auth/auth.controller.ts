@@ -115,8 +115,14 @@ export class AuthController {
     return this.authService.resetPassword(body);
   }
 
+    @Get('profile')
   @UseGuards(AuthGuard)
+  async profile(@Req() req: any) {
+    return this.authService.profile(req.user.id);
+  }
+
   @Post('/logout')
+  @UseGuards(AuthGuard)
   logout(@Request() req: any) {
     const { user } = req;
     const jti = user.jti;
