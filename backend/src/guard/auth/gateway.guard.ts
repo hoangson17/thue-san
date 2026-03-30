@@ -18,13 +18,15 @@ export class GatewayGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient();
     const authHeader = client.handshake.headers.authorization;
-
+    const authToken = client.handshake.auth?.token;
     if (!authHeader) throw new UnauthorizedException();
 
-    const token = authHeader.split(' ')[1];
+    // const token = authHeader.split(' ')[1];
     // const token = authHeader.split(' ').slice(-1).join('');
     // console.log(token);
-    
+    const token =
+      authHeader?.split(' ')[1] ||
+      (typeof authToken === 'string' ? authToken : undefined); 
     if (!token) throw new UnauthorizedException();
 
     const decode = this.authService.verifyToken(token);

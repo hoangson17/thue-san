@@ -9,6 +9,23 @@ const instance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// Biến để quản lý việc refresh token đang diễn ra
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  isRefreshing = false;
+  failedQueue = [];
+};
+
 instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -32,31 +49,71 @@ instance.interceptors.response.use(
       !originalRequest._retry &&
       !originalRequest.url?.includes("/auth/refresh-token")
     ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return instance(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
         const refreshToken = localStorage.getItem("refreshToken");
-        if (!refreshToken) throw new Error("No refresh token");
+        if (!refreshToken) throw new Error("No refresh token available");
 
         const res = await axios.post(
           `${import.meta.env.VITE_SERVER_API}/auth/refresh-token`,
           { refreshToken },
+          {
+            timeout: 5000,
+          }
         );
 
-        const { accessToken } = res.data;
+        const { accessToken, refreshToken: newRefreshToken } = res.data;
 
         localStorage.setItem("accessToken", accessToken);
+        
+        // Nếu server trả về refresh token mới, cập nhật nó
+        if (newRefreshToken) {
+          localStorage.setItem("refreshToken", newRefreshToken);
+        }
+
         // Đồng bộ lại kết nối realtime với token mới
-        socketClient.disconnect();
-        socketClient.connect();
+        try {
+          socketClient.disconnect();
+          socketClient.connect();
+        } catch (socketErr) {
+          console.error("Socket reconnect error:", socketErr);
+        }
+
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        
+        processQueue(null, accessToken);
+        
         return instance(originalRequest);
-      } catch (err) {
-        // refresh token chết → logout
-        socketClient.disconnect();
+      } catch (err: any) {
+        console.error("Refresh token failed:", err.message);
+        
+        // Refresh token chết → logout
+        try {
+          socketClient.disconnect();
+        } catch (socketErr) {
+          console.error("Socket disconnect error:", socketErr);
+        }
+        
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         reduxStore().store.dispatch(logout());
+
+        processQueue(err, null);
 
         return Promise.reject(err);
       }

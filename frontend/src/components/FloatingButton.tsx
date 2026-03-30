@@ -91,7 +91,6 @@ export default function FloatingChat() {
       >
         {isAuthenticated ? <MessageCircle className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </Button>
-s   
       {/* Khung Chat */}
       {open && isAuthenticated && (
         <div className="fixed bottom-24 right-6 w-85 h-[500px] bg-background border rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[9999]">
